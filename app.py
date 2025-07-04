@@ -228,60 +228,192 @@ def get_css_theme():
             background: #00d4ff;
         }
         
-        /* Melhorias específicas para legibilidade */
-        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-            color: #ffffff !important;
-            font-weight: bold !important;
-        }
+        /* CORREÇÕES ESPECÍFICAS PARA ELEMENTOS PROBLEMÁTICOS */
         
-        .stMarkdown p {
-            color: #ffffff !important;
-            line-height: 1.6 !important;
-        }
-        
-        /* Texto das colunas */
-        .stColumn > div {
+        /* 1. Barra de navegação (sidebar) - CORREÇÃO ESPECÍFICA */
+        section[data-testid="stSidebar"] .stSelectbox > div > div > div {
+            background-color: #262730 !important;
             color: #ffffff !important;
         }
         
-        /* Texto dos containers */
-        .stContainer > div {
+        section[data-testid="stSidebar"] .stSelectbox > div > div > div > div {
+            background-color: #262730 !important;
             color: #ffffff !important;
         }
         
-        /* Forçar cor branca em todos os elementos de texto */
+        section[data-testid="stSidebar"] .stSelectbox > div > div > div > div > div {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* 2. Campos de quantidade e valor unitário - CORREÇÃO ESPECÍFICA */
+        .stNumberInput > div > div > input {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+            border: 1px solid #404040 !important;
+        }
+        
+        .stNumberInput > div > div > input::placeholder {
+            color: #a0a0a0 !important;
+        }
+        
+        /* 3. Campo de observações (textarea) - CORREÇÃO ESPECÍFICA */
+        .stTextArea > div > div > textarea {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+            border: 1px solid #404040 !important;
+        }
+        
+        .stTextArea > div > div > textarea::placeholder {
+            color: #a0a0a0 !important;
+        }
+        
+        /* 4. Calendários (date_input) - CORREÇÃO ESPECÍFICA */
+        .stDateInput > div > div > input {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+            border: 1px solid #404040 !important;
+        }
+        
+        .stDateInput > div > div > input::placeholder {
+            color: #a0a0a0 !important;
+        }
+        
+        /* 5. Dropdown do calendário - CORREÇÃO ESPECÍFICA */
+        .stDateInput > div > div > div {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        .stDateInput > div > div > div > div {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* 6. Labels dos campos - CORREÇÃO ESPECÍFICA */
+        .stTextInput label, .stNumberInput label, .stSelectbox label, .stTextArea label, .stDateInput label {
+            color: #ffffff !important;
+            font-weight: 500 !important;
+        }
+        
+        /* 7. Seletores mais específicos para garantir aplicação */
+        [data-baseweb="select"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        [data-baseweb="select"] > div {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        [data-baseweb="select"] > div > div {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* 8. Inputs específicos */
+        [data-baseweb="input"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        [data-baseweb="input"] > input {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* 9. Textarea específico */
+        [data-baseweb="textarea"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        [data-baseweb="textarea"] > textarea {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* 10. Date input específico */
+        [data-baseweb="date-input"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        [data-baseweb="date-input"] > input {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* 11. Forçar aplicação em todos os elementos de entrada */
+        input[type="number"], input[type="text"], input[type="date"], textarea {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+            border: 1px solid #404040 !important;
+        }
+        
+        /* 12. Elementos do BaseWeb */
+        [data-baseweb="base-input"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        [data-baseweb="base-input"] input {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* 13. Dropdowns com roles específicos */
+        .stSelectbox [role="listbox"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        .stSelectbox [role="option"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        .stSelectbox [role="option"]:hover {
+            background-color: #00d4ff !important;
+            color: #000000 !important;
+        }
+        
+        /* 14. Calendários com roles específicos */
+        .stDateInput [role="dialog"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        .stDateInput [role="grid"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        .stDateInput [role="gridcell"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* 15. Forçar aplicação geral */
         * {
             color: #ffffff !important;
         }
         
-        /* Exceções para elementos que devem manter cores específicas */
-        .stButton > button {
-            color: #000000 !important;
+        input, textarea, select {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+            border: 1px solid #404040 !important;
         }
         
-        .success-message {
-            color: #4ade80 !important;
-        }
-        
-        .warning-message {
-            color: #fbbf24 !important;
-        }
-        
-        .error-message {
-            color: #f87171 !important;
-        }
-        
-        a {
-            color: #00d4ff !important;
-        }
-        
-        /* Texto dos gráficos Plotly */
-        .js-plotly-plot .plotly .main-svg {
+        /* 16. Elementos específicos do Streamlit */
+        .stSelectbox, .stTextInput, .stNumberInput, .stTextArea, .stDateInput {
+            background-color: #262730 !important;
             color: #ffffff !important;
         }
         
-        /* Override para elementos específicos do Streamlit */
-        .stMarkdown, .stMarkdown *, .stText, .stText * {
+        .stSelectbox *, .stTextInput *, .stNumberInput *, .stTextArea *, .stDateInput * {
+            background-color: #262730 !important;
             color: #ffffff !important;
         }
     </style>
@@ -301,10 +433,48 @@ class EstoqueTI:
             try:
                 self.df_estoque = pd.read_excel(self.excel_file, sheet_name='Estoque')
                 self.df_movimentacoes = pd.read_excel(self.excel_file, sheet_name='Movimentacoes')
+                
+                # Verificar se a coluna codigo_produto existe, se não, adicionar
+                if 'codigo_produto' not in self.df_estoque.columns:
+                    self.migrate_data()
             except:
                 self.create_initial_data()
         else:
             self.create_initial_data()
+    
+    def migrate_data(self):
+        """Migra dados existentes para incluir código do produto"""
+        # Gerar códigos para produtos existentes
+        codigos = []
+        for idx, row in self.df_estoque.iterrows():
+            categoria = row['categoria']
+            marca = row['marca']
+            
+            # Gerar código baseado na categoria e marca
+            if categoria == 'Notebook':
+                prefixo = 'NB'
+            elif categoria == 'Monitor':
+                prefixo = 'MON'
+            elif categoria == 'Impressora':
+                prefixo = 'IMP'
+            elif categoria == 'Rede':
+                prefixo = 'SW'
+            elif categoria == 'Servidor':
+                prefixo = 'SRV'
+            elif categoria == 'Periférico':
+                prefixo = 'PER'
+            else:
+                prefixo = 'OUT'
+            
+            # Criar código único
+            codigo = f"{prefixo}-{marca.upper()}-{idx+1:03d}"
+            codigos.append(codigo)
+        
+        # Adicionar coluna de código do produto
+        self.df_estoque['codigo_produto'] = codigos
+        
+        # Salvar dados migrados
+        self.save_data()
     
     def create_initial_data(self):
         """Cria estrutura inicial do Excel com dados de exemplo"""
@@ -315,6 +485,7 @@ class EstoqueTI:
             'categoria': ['Notebook', 'Monitor', 'Impressora', 'Rede', 'Servidor'],
             'marca': ['Dell', 'LG', 'HP', 'Cisco', 'Dell'],
             'modelo': ['Latitude 5520', '24ML600', 'LaserJet Pro', 'Catalyst 2960', 'PowerEdge R740'],
+            'codigo_produto': ['NB-DELL-001', 'MON-LG-002', 'IMP-HP-003', 'SW-CISCO-004', 'SRV-DELL-005'],
             'quantidade': [15, 25, 8, 12, 3],
             'valor_unitario': [3500.00, 800.00, 1200.00, 2500.00, 15000.00],
             'data_chegada': ['2024-01-15', '2024-02-10', '2024-01-20', '2024-03-05', '2024-02-28'],
@@ -341,7 +512,7 @@ class EstoqueTI:
             self.df_estoque.to_excel(writer, sheet_name='Estoque', index=False)
             self.df_movimentacoes.to_excel(writer, sheet_name='Movimentacoes', index=False)
     
-    def adicionar_equipamento(self, equipamento, categoria, marca, modelo, quantidade, valor_unitario, fornecedor):
+    def adicionar_equipamento(self, equipamento, categoria, marca, modelo, codigo_produto, quantidade, valor_unitario, fornecedor):
         """Adiciona novo equipamento ao estoque"""
         novo_id = self.df_estoque['id'].max() + 1 if not self.df_estoque.empty else 1
         
@@ -351,6 +522,7 @@ class EstoqueTI:
             'categoria': categoria,
             'marca': marca,
             'modelo': modelo,
+            'codigo_produto': codigo_produto,
             'quantidade': quantidade,
             'valor_unitario': valor_unitario,
             'data_chegada': datetime.now().strftime('%Y-%m-%d'),
@@ -424,19 +596,50 @@ def get_plotly_theme():
         }
     }
 
+def mostrar_notificacao(tipo, mensagem):
+    """Exibe notificação com estilo melhorado para modo escuro"""
+    if tipo == "success":
+        st.markdown(f"""
+        <div class="success-message">
+            <strong>✅ {mensagem}</strong>
+        </div>
+        """, unsafe_allow_html=True)
+    elif tipo == "warning":
+        st.markdown(f"""
+        <div class="warning-message">
+            <strong>⚠️ {mensagem}</strong>
+        </div>
+        """, unsafe_allow_html=True)
+    elif tipo == "error":
+        st.markdown(f"""
+        <div class="error-message">
+            <strong>❌ {mensagem}</strong>
+        </div>
+        """, unsafe_allow_html=True)
+
 def main():
     # Inicializar sistema de estoque
     estoque = EstoqueTI()
     
+    # Carregar CSS externo
+    with open('styles.css', 'r', encoding='utf-8') as f:
+        css_content = f.read()
+    
+    # Aplicar CSS customizado
+    st.markdown(f'<style>{css_content}</style>', unsafe_allow_html=True)
+    
+    # Aplicar tema escuro
+    st.markdown(get_css_theme(), unsafe_allow_html=True)
+    
     # Sidebar para navegação
-    st.sidebar.title("��️ Controles")
+    st.sidebar.title("🔧 Controles")
     
     st.sidebar.markdown("---")
     
     # Navegação
     pagina = st.sidebar.selectbox(
         "📱 Navegação:",
-        ["📈 Dashboard", "➕ Adicionar Equipamento", "➖ Remover Equipamento", "📋 Histórico de Movimentações"]
+        ["📈 Dashboard", "➕ Adicionar Equipamento", "➖ Remover Equipamento", "📋 Histórico de Movimentações", "🏷️ Código Produto"]
     )
     
     # Header principal com ícone de notebook
@@ -450,6 +653,8 @@ def main():
         remover_equipamento_page(estoque)
     elif pagina == "📋 Histórico de Movimentações":
         historico_movimentacoes_page(estoque)
+    elif pagina == "🏷️ Código Produto":
+        codigo_produto_page(estoque)
 
 def mostrar_dashboard(estoque):
     """Página principal do dashboard com análises visuais"""
@@ -542,8 +747,13 @@ def mostrar_dashboard(estoque):
     df_display['valor_total'] = df_display['valor_total'].apply(lambda x: f"R$ {x:,.2f}")
     df_display['valor_unitario'] = df_display['valor_unitario'].apply(lambda x: f"R$ {x:,.2f}")
     
+    # Verificar se a coluna codigo_produto existe
+    colunas_exibicao = ['equipamento', 'categoria', 'marca', 'modelo', 'quantidade', 'valor_unitario', 'valor_total', 'status']
+    if 'codigo_produto' in df_display.columns:
+        colunas_exibicao.insert(0, 'codigo_produto')
+    
     st.dataframe(
-        df_display[['equipamento', 'categoria', 'marca', 'modelo', 'quantidade', 'valor_unitario', 'valor_total', 'status']],
+        df_display[colunas_exibicao],
         use_container_width=True
     )
 
@@ -551,7 +761,33 @@ def adicionar_equipamento_page(estoque):
     """Página para adicionar novos equipamentos"""
     st.markdown("## ➕ Adicionar Novo Equipamento")
     
-    with st.form("adicionar_equipamento"):
+    # Inicializar session_state para controlar reset
+    if 'form_submitted' not in st.session_state:
+        st.session_state.form_submitted = False
+    if 'form_message' not in st.session_state:
+        st.session_state.form_message = ""
+    if 'form_message_type' not in st.session_state:
+        st.session_state.form_message_type = ""
+    
+    # Mostrar mensagem de feedback se existir
+    if st.session_state.form_message:
+        mostrar_notificacao(st.session_state.form_message_type, st.session_state.form_message)
+        # Limpar mensagem após exibir
+        st.session_state.form_message = ""
+        st.session_state.form_message_type = ""
+    
+    # Informações sobre a operação
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.info(f"**Total de Equipamentos:** {len(estoque.df_estoque)}")
+    with col2:
+        st.info(f"**Categorias:** {estoque.df_estoque['categoria'].nunique()}")
+    with col3:
+        st.info(f"**Marcas:** {estoque.df_estoque['marca'].nunique()}")
+    
+    st.markdown("---")
+    
+    with st.form("adicionar_equipamento", clear_on_submit=True):
         col1, col2 = st.columns(2)
         
         with col1:
@@ -559,39 +795,78 @@ def adicionar_equipamento_page(estoque):
             categoria = st.selectbox("Categoria", ["Notebook", "Monitor", "Impressora", "Rede", "Servidor", "Periférico", "Outro"])
             marca = st.text_input("Marca", placeholder="Ex: Dell")
             modelo = st.text_input("Modelo", placeholder="Ex: Latitude 5520")
+            codigo_produto = st.text_input("Código do Produto", placeholder="Ex: NB-DELL-001")
         
         with col2:
             quantidade = st.number_input("Quantidade", min_value=1, value=1)
             valor_unitario = st.number_input("Valor Unitário (R$)", min_value=0.0, value=0.0, step=0.01)
             fornecedor = st.text_input("Fornecedor", placeholder="Ex: Dell Brasil")
         
-        submitted = st.form_submit_button("Adicionar ao Estoque")
+        # Mostrar valor total calculado
+        if valor_unitario > 0 and quantidade > 0:
+            valor_total = valor_unitario * quantidade
+            st.markdown(f"**💰 Valor Total:** R$ {valor_total:,.2f}")
+        
+        submitted = st.form_submit_button("✅ Adicionar ao Estoque")
         
         if submitted:
-            if equipamento and marca and modelo and fornecedor:
+            if equipamento and marca and modelo and codigo_produto and fornecedor:
                 success = estoque.adicionar_equipamento(
-                    equipamento, categoria, marca, modelo, quantidade, valor_unitario, fornecedor
+                    equipamento, categoria, marca, modelo, codigo_produto, quantidade, valor_unitario, fornecedor
                 )
                 if success:
-                    st.success("✅ Equipamento adicionado com sucesso!")
+                    st.session_state.form_message = f"✅ Equipamento '{equipamento}' adicionado com sucesso! (Qtd: {quantidade})"
+                    st.session_state.form_message_type = "success"
                     st.rerun()
                 else:
-                    st.error("❌ Erro ao adicionar equipamento")
+                    st.session_state.form_message = "❌ Erro ao adicionar equipamento"
+                    st.session_state.form_message_type = "error"
+                    st.rerun()
             else:
-                st.warning("⚠️ Preencha todos os campos obrigatórios")
+                st.session_state.form_message = "⚠️ Preencha todos os campos obrigatórios"
+                st.session_state.form_message_type = "warning"
+                st.rerun()
 
 def remover_equipamento_page(estoque):
     """Página para remover equipamentos"""
     st.markdown("## ➖ Remover Equipamento")
     
+    # Inicializar session_state para controlar reset
+    if 'remove_form_submitted' not in st.session_state:
+        st.session_state.remove_form_submitted = False
+    if 'remove_form_message' not in st.session_state:
+        st.session_state.remove_form_message = ""
+    if 'remove_form_message_type' not in st.session_state:
+        st.session_state.remove_form_message_type = ""
+    
+    # Mostrar mensagem de feedback se existir
+    if st.session_state.remove_form_message:
+        mostrar_notificacao(st.session_state.remove_form_message_type, st.session_state.remove_form_message)
+        # Limpar mensagem após exibir
+        st.session_state.remove_form_message = ""
+        st.session_state.remove_form_message_type = ""
+    
     # Selecionar equipamento
     equipamentos_disponiveis = estoque.df_estoque[estoque.df_estoque['quantidade'] > 0]
     
     if equipamentos_disponiveis.empty:
-        st.warning("⚠️ Não há equipamentos disponíveis para remoção")
+        mostrar_notificacao("warning", "Não há equipamentos disponíveis para remoção")
         return
     
-    with st.form("remover_equipamento"):
+    # Informações sobre a operação
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.info(f"**Equipamentos Disponíveis:** {len(equipamentos_disponiveis)}")
+    with col2:
+        total_disponivel = equipamentos_disponiveis['quantidade'].sum()
+        st.info(f"**Quantidade Total:** {total_disponivel}")
+    with col3:
+        valor_total_disponivel = (equipamentos_disponiveis['quantidade'] * equipamentos_disponiveis['valor_unitario']).sum()
+        st.info(f"**Valor Total:** R$ {valor_total_disponivel:,.2f}")
+    
+    st.markdown("---")
+    
+    with st.form("remover_equipamento", clear_on_submit=True):
         equipamento_id = st.selectbox(
             "Selecione o Equipamento",
             options=equipamentos_disponiveis['id'].tolist(),
@@ -605,18 +880,30 @@ def remover_equipamento_page(estoque):
         destino = st.text_input("Destino", placeholder="Ex: Loja Shopping Center")
         observacoes = st.text_area("Observações", placeholder="Ex: Transferência para nova loja")
         
-        submitted = st.form_submit_button("Remover do Estoque")
+        # Mostrar informações do equipamento selecionado
+        if equipamento_id:
+            st.markdown(f"**📦 Equipamento Selecionado:** {equipamento_selecionado['equipamento']}")
+            st.markdown(f"**🏷️ Código:** {equipamento_selecionado.get('codigo_produto', 'N/A')}")
+            st.markdown(f"**💰 Valor Unitário:** R$ {equipamento_selecionado['valor_unitario']:,.2f}")
+            st.markdown(f"**📊 Quantidade Disponível:** {quantidade_maxima}")
+        
+        submitted = st.form_submit_button("❌ Remover do Estoque")
         
         if submitted:
             if destino:
                 success = estoque.remover_equipamento(equipamento_id, quantidade, destino, observacoes)
                 if success:
-                    st.success("✅ Equipamento removido com sucesso!")
+                    st.session_state.remove_form_message = f"✅ Equipamento removido com sucesso! (Qtd: {quantidade})"
+                    st.session_state.remove_form_message_type = "success"
                     st.rerun()
                 else:
-                    st.error("❌ Erro ao remover equipamento")
+                    st.session_state.remove_form_message = "❌ Erro ao remover equipamento"
+                    st.session_state.remove_form_message_type = "error"
+                    st.rerun()
             else:
-                st.warning("⚠️ Preencha o campo de destino")
+                st.session_state.remove_form_message = "⚠️ Preencha o campo de destino"
+                st.session_state.remove_form_message_type = "warning"
+                st.rerun()
 
 def historico_movimentacoes_page(estoque):
     """Página com histórico de movimentações"""
@@ -669,6 +956,160 @@ def historico_movimentacoes_page(estoque):
     df_display = df_filtrado[['data_movimentacao', 'equipamento', 'categoria', 'tipo_movimentacao', 'quantidade', 'destino_origem', 'observacoes']].sort_values('data_movimentacao', ascending=False)
     
     st.dataframe(df_display, use_container_width=True)
+
+def codigo_produto_page(estoque):
+    """Página para visualização e busca de códigos de produtos"""
+    st.markdown("## 🏷️ Código Produto")
+    
+    # Métricas dos códigos
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        total_codigos = len(estoque.df_estoque)
+        st.metric("Total de Produtos", total_codigos)
+    
+    with col2:
+        categorias_com_codigo = estoque.df_estoque['categoria'].nunique()
+        st.metric("Categorias com Código", categorias_com_codigo)
+    
+    with col3:
+        marcas_com_codigo = estoque.df_estoque['marca'].nunique()
+        st.metric("Marcas com Código", marcas_com_codigo)
+    
+    st.markdown("---")
+    
+    # Filtros de busca
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        categoria_filtro = st.selectbox(
+            "Filtrar por Categoria",
+            ["Todas"] + estoque.df_estoque['categoria'].unique().tolist()
+        )
+    
+    with col2:
+        marca_filtro = st.selectbox(
+            "Filtrar por Marca",
+            ["Todas"] + estoque.df_estoque['marca'].unique().tolist()
+        )
+    
+    # Busca por código
+    codigo_busca = st.text_input("🔍 Buscar por Código do Produto", placeholder="Digite o código para buscar...")
+    
+    # Aplicar filtros
+    df_filtrado = estoque.df_estoque.copy()
+    
+    if categoria_filtro != "Todas":
+        df_filtrado = df_filtrado[df_filtrado['categoria'] == categoria_filtro]
+    
+    if marca_filtro != "Todas":
+        df_filtrado = df_filtrado[df_filtrado['marca'] == marca_filtro]
+    
+    if codigo_busca:
+        df_filtrado = df_filtrado[
+            (df_filtrado['codigo_produto'].str.contains(codigo_busca, case=False, na=False) if 'codigo_produto' in df_filtrado.columns else False) |
+            df_filtrado['equipamento'].str.contains(codigo_busca, case=False, na=False)
+        ]
+    
+    # Gráfico de distribuição por categoria
+    if not df_filtrado.empty:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            fig_categoria = px.pie(
+                df_filtrado.groupby('categoria').size().reset_index(name='quantidade'),
+                values='quantidade',
+                names='categoria',
+                title='Produtos por Categoria',
+                color_discrete_sequence=px.colors.qualitative.Set3
+            )
+            fig_categoria.update_layout(**get_plotly_theme()['layout'])
+            fig_categoria.update_traces(textposition='inside', textinfo='percent+label')
+            st.plotly_chart(fig_categoria, use_container_width=True)
+        
+        with col2:
+            fig_marca = px.bar(
+                df_filtrado.groupby('marca').size().reset_index(name='quantidade'),
+                x='marca',
+                y='quantidade',
+                title='Produtos por Marca',
+                color='quantidade',
+                color_continuous_scale='viridis'
+            )
+            fig_marca.update_layout(**get_plotly_theme()['layout'])
+            st.plotly_chart(fig_marca, use_container_width=True)
+    
+    # Tabela de códigos de produtos
+    st.markdown("### 📋 Códigos dos Produtos")
+    
+    if not df_filtrado.empty:
+        # Preparar dados para exibição
+        df_display = df_filtrado.copy()
+        df_display['valor_total'] = df_display['quantidade'] * df_display['valor_unitario']
+        df_display['valor_total'] = df_display['valor_total'].apply(lambda x: f"R$ {x:,.2f}")
+        df_display['valor_unitario'] = df_display['valor_unitario'].apply(lambda x: f"R$ {x:,.2f}")
+        
+        # Ordenar por código do produto
+        if 'codigo_produto' in df_display.columns:
+            df_display = df_display.sort_values('codigo_produto')
+        
+        # Exibir tabela com códigos em destaque
+        colunas_exibicao = ['equipamento', 'categoria', 'marca', 'modelo', 'quantidade', 'valor_unitario', 'valor_total', 'status']
+        if 'codigo_produto' in df_display.columns:
+            colunas_exibicao.insert(0, 'codigo_produto')
+        
+        st.dataframe(
+            df_display[colunas_exibicao],
+            use_container_width=True
+        )
+        
+        # Estatísticas dos códigos
+        st.markdown("### 📊 Estatísticas dos Códigos")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.info(f"**Produtos Encontrados:** {len(df_filtrado)}")
+        
+        with col2:
+            if not df_filtrado.empty:
+                valor_total_filtrado = df_filtrado['quantidade'].sum() * df_filtrado['valor_unitario'].sum()
+                st.info(f"**Valor Total:** R$ {valor_total_filtrado:,.2f}")
+            else:
+                st.info("**Valor Total:** R$ 0,00")
+        
+        with col3:
+            if not df_filtrado.empty:
+                disponiveis_filtrado = df_filtrado[df_filtrado['status'] == 'Disponível']['quantidade'].sum()
+                st.info(f"**Disponíveis:** {disponiveis_filtrado}")
+            else:
+                st.info("**Disponíveis:** 0")
+    
+    else:
+        st.warning("⚠️ Nenhum produto encontrado com os filtros aplicados.")
+        
+        if codigo_busca:
+            st.info("💡 **Dica:** Verifique se o código foi digitado corretamente ou tente uma busca mais ampla.")
+        
+        # Mostrar todos os produtos se não houver resultados
+        if codigo_busca or categoria_filtro != "Todas" or marca_filtro != "Todas":
+            st.markdown("### 📋 Todos os Produtos")
+            df_display = estoque.df_estoque.copy()
+            df_display['valor_total'] = df_display['quantidade'] * df_display['valor_unitario']
+            df_display['valor_total'] = df_display['valor_total'].apply(lambda x: f"R$ {x:,.2f}")
+            df_display['valor_unitario'] = df_display['valor_unitario'].apply(lambda x: f"R$ {x:,.2f}")
+            
+            if 'codigo_produto' in df_display.columns:
+                df_display = df_display.sort_values('codigo_produto')
+            
+            colunas_exibicao = ['equipamento', 'categoria', 'marca', 'modelo', 'quantidade', 'valor_unitario', 'valor_total', 'status']
+            if 'codigo_produto' in df_display.columns:
+                colunas_exibicao.insert(0, 'codigo_produto')
+            
+            st.dataframe(
+                df_display[colunas_exibicao],
+                use_container_width=True
+            )
 
 if __name__ == "__main__":
     main() 

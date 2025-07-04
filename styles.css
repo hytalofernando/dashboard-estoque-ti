@@ -95,7 +95,7 @@
     color: var(--text-primary) !important;
 }
 
-/* Mensagens */
+/* Mensagens - MELHORADAS para modo escuro */
 .success-message {
     background-color: var(--success-bg) !important;
     color: var(--success-text) !important;
@@ -120,6 +120,44 @@
     border: 1px solid var(--error-text);
 }
 
+/* Notificações do Streamlit - CORREÇÃO DE CORES */
+.dark-mode .stAlert {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .stAlert[data-baseweb="notification"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Notificações específicas */
+.dark-mode .stAlert[data-baseweb="notification"] .stAlertContent {
+    color: var(--text-primary) !important;
+}
+
+/* Success notifications */
+.dark-mode .stAlert[data-baseweb="notification"] .stAlertContent:has([data-testid="stAlertContent"]) {
+    background-color: var(--success-bg) !important;
+    color: var(--success-text) !important;
+    border: 1px solid var(--success-text) !important;
+}
+
+/* Warning notifications */
+.dark-mode .stAlert[data-baseweb="notification"] .stAlertContent:has([data-testid="stAlertContent"]) {
+    background-color: var(--warning-bg) !important;
+    color: var(--warning-text) !important;
+    border: 1px solid var(--warning-text) !important;
+}
+
+/* Error notifications */
+.dark-mode .stAlert[data-baseweb="notification"] .stAlertContent:has([data-testid="stAlertContent"]) {
+    background-color: var(--error-bg) !important;
+    color: var(--error-text) !important;
+    border: 1px solid var(--error-text) !important;
+}
+
 /* Formulários */
 .stForm {
     background-color: var(--bg-secondary) !important;
@@ -128,7 +166,7 @@
     border: 1px solid var(--border-color);
 }
 
-/* Campos de entrada */
+/* Campos de entrada - MELHORADOS */
 .dark-mode .stTextInput>div>div>input,
 .dark-mode .stNumberInput>div>div>input,
 .dark-mode .stTextArea>div>div>textarea {
@@ -137,20 +175,246 @@
     border: 1px solid var(--border-color) !important;
 }
 
-/* Selectbox */
+/* Selectbox - MELHORADO */
 .dark-mode .stSelectbox>div>div {
     background-color: var(--bg-secondary) !important;
     color: var(--text-primary) !important;
 }
 
-/* Dataframe */
-.dark-mode .stDataFrame {
+/* Date input - NOVO */
+.dark-mode .stDateInput>div>div>input {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Dropdown menus - NOVO */
+.dark-mode .stSelectbox>div>div>div {
     background-color: var(--bg-secondary) !important;
     color: var(--text-primary) !important;
 }
 
-/* Métricas */
-.dark-mode .stMetric {
+.dark-mode .stSelectbox>div>div>div>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Labels dos filtros - NOVO */
+.dark-mode .stSelectbox>label,
+.dark-mode .stDateInput>label,
+.dark-mode .stTextInput>label,
+.dark-mode .stNumberInput>label {
+    color: var(--text-primary) !important;
+    font-weight: 500 !important;
+}
+
+/* CORREÇÕES ESPECÍFICAS PARA OS PROBLEMAS MENCIONADOS */
+
+/* 1. Barra de navegação (sidebar) - CORREÇÃO */
+.dark-mode .css-1d391kg .css-1lcbmhc .stSelectbox>div>div>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .css-1d391kg .css-1lcbmhc .stSelectbox>div>div>div>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .css-1d391kg .css-1lcbmhc .stSelectbox>div>div>div>div>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 2. Campos de quantidade e valor unitário - CORREÇÃO */
+.dark-mode .stNumberInput>div>div>input {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark-mode .stNumberInput>div>div>input::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+/* 3. Campo de observações (textarea) - CORREÇÃO */
+.dark-mode .stTextArea>div>div>textarea {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark-mode .stTextArea>div>div>textarea::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+/* 4. Calendários (date_input) - CORREÇÃO ESPECÍFICA */
+.dark-mode .stDateInput>div>div>input {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark-mode .stDateInput>div>div>input::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+/* 5. Dropdown do calendário - CORREÇÃO */
+.dark-mode .stDateInput>div>div>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .stDateInput>div>div>div>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 6. Seletores mais específicos para garantir aplicação */
+.dark-mode [data-baseweb="select"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode [data-baseweb="select"]>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode [data-baseweb="select"]>div>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 7. Inputs numéricos específicos */
+.dark-mode [data-baseweb="input"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode [data-baseweb="input"]>input {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 8. Textarea específico */
+.dark-mode [data-baseweb="textarea"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode [data-baseweb="textarea"]>textarea {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 9. Date input específico */
+.dark-mode [data-baseweb="date-input"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode [data-baseweb="date-input"]>input {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 10. Estilos adicionais para garantir cobertura completa */
+.dark-mode input[type="number"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark-mode input[type="text"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark-mode input[type="date"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark-mode textarea {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* 11. Seletores para elementos do BaseWeb */
+.dark-mode [data-baseweb="base-input"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode [data-baseweb="base-input"] input {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 12. Correção para dropdowns específicos */
+.dark-mode .stSelectbox [role="listbox"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .stSelectbox [role="option"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .stSelectbox [role="option"]:hover {
+    background-color: var(--accent-color) !important;
+    color: #ffffff !important;
+}
+
+/* 13. Correção para calendários específicos */
+.dark-mode .stDateInput [role="dialog"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .stDateInput [role="grid"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .stDateInput [role="gridcell"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 14. Forçar aplicação com !important em todos os elementos */
+.dark-mode * {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* 15. Estilos específicos para elementos do Streamlit */
+.dark-mode .stSelectbox,
+.dark-mode .stTextInput,
+.dark-mode .stNumberInput,
+.dark-mode .stTextArea,
+.dark-mode .stDateInput {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .stSelectbox *,
+.dark-mode .stTextInput *,
+.dark-mode .stNumberInput *,
+.dark-mode .stTextArea *,
+.dark-mode .stDateInput * {
     background-color: var(--bg-secondary) !important;
     color: var(--text-primary) !important;
 }
@@ -265,4 +529,16 @@
 
 .dark-mode ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-color);
+}
+
+/* Dataframe */
+.dark-mode .stDataFrame {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Métricas */
+.dark-mode .stMetric {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
 }
