@@ -1,0 +1,265 @@
+/* ===== VARIÁVEIS CSS - CORES CENTRALIZADAS ===== */
+:root {
+    --bg-primary: #0e1117;
+    --bg-secondary: #262730;
+    --bg-tertiary: #404040;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --accent-color: #00d4ff;
+    --success-bg: #1e4d2b;
+    --success-text: #4ade80;
+    --warning-bg: #4d3c00;
+    --warning-text: #fbbf24;
+    --error-bg: #4d1a1a;
+    --error-text: #f87171;
+}
+
+/* ===== CONFIGURAÇÃO GLOBAL ===== */
+.stApp {
+    background-color: var(--bg-primary) !important;
+}
+
+/* ===== HEADER PRINCIPAL ===== */
+.main-header {
+    font-size: 3rem;
+    color: var(--text-primary) !important;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== SIDEBAR - VERSÃO OTIMIZADA ===== */
+section[data-testid="stSidebar"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Aplicar fundo em todos os elementos filhos */
+section[data-testid="stSidebar"] * {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Texto geral da sidebar */
+section[data-testid="stSidebar"] *:not(h1):not(h2):not(h3):not(label) {
+    color: var(--text-secondary) !important;
+}
+
+/* Títulos da sidebar */
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {
+    color: var(--accent-color) !important;
+    background-color: var(--bg-secondary) !important;
+    font-weight: bold !important;
+}
+
+/* Labels da sidebar */
+section[data-testid="stSidebar"] label {
+    color: var(--text-secondary) !important;
+    background-color: var(--bg-secondary) !important;
+    font-weight: 500 !important;
+}
+
+/* ===== SELECTBOX OTIMIZADO ===== */
+section[data-testid="stSidebar"] .stSelectbox>div>div>div>div>div {
+    color: var(--accent-color) !important;
+    background-color: var(--bg-secondary) !important;
+    font-weight: 500 !important;
+}
+
+/* Opções do dropdown */
+section[data-testid="stSidebar"] [role="option"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+section[data-testid="stSidebar"] [role="option"]:hover {
+    background-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+/* Listbox do dropdown */
+section[data-testid="stSidebar"] [role="listbox"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--bg-tertiary) !important;
+}
+
+/* ===== ELEMENTOS DINÂMICOS ===== */
+section[data-testid="stSidebar"] [data-baseweb="select"],
+section[data-testid="stSidebar"] [data-baseweb="input"],
+section[data-testid="stSidebar"] [data-baseweb="textarea"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+section[data-testid="stSidebar"] [class*="st"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ===== SEPARADORES ===== */
+section[data-testid="stSidebar"] hr {
+    border-color: var(--bg-tertiary) !important;
+    background-color: var(--bg-tertiary) !important;
+    height: 1px !important;
+}
+
+/* ===== NOTIFICAÇÕES OTIMIZADAS ===== */
+.success-message {
+    background-color: var(--success-bg) !important;
+    color: var(--success-text) !important;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--success-text);
+}
+
+.warning-message {
+    background-color: var(--warning-bg) !important;
+    color: var(--warning-text) !important;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--warning-text);
+}
+
+.error-message {
+    background-color: var(--error-bg) !important;
+    color: var(--error-text) !important;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--error-text);
+}
+
+/* ===== FORMULÁRIOS ===== */
+.stForm {
+    background-color: var(--bg-secondary) !important;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--bg-tertiary);
+}
+
+/* Campos de entrada */
+.stTextInput>div>div>input,
+.stNumberInput>div>div>input,
+.stTextArea>div>div>textarea {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--bg-tertiary) !important;
+}
+
+/* Selectbox principal */
+.stSelectbox>div>div {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ===== COMPONENTES PRINCIPAIS ===== */
+.stDataFrame {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.stMetric {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ===== BOTÕES ===== */
+.stButton>button {
+    background-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: bold !important;
+}
+
+.stButton>button:hover {
+    background-color: #0099cc !important;
+    color: var(--text-primary) !important;
+}
+
+/* ===== TOGGLE ===== */
+.stToggle>div>div {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.stToggle>div>div[data-checked="true"] {
+    background-color: var(--accent-color) !important;
+}
+
+/* ===== TEXTO GERAL ===== */
+.css-1v0mbdj,
+.css-1v0mbdj p,
+.css-1v0mbdj div {
+    color: var(--text-primary) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-primary) !important;
+}
+
+.stMarkdown,
+.stMarkdown p {
+    color: var(--text-primary) !important;
+}
+
+/* Labels e textos de formulários */
+.stTextInput label,
+.stNumberInput label,
+.stSelectbox label,
+.stTextArea label {
+    color: var(--text-primary) !important;
+}
+
+/* Texto das métricas */
+.stMetric>div>div>div {
+    color: var(--text-primary) !important;
+}
+
+/* Texto dos dataframes */
+.stDataFrame>div>div>div {
+    color: var(--text-primary) !important;
+}
+
+/* ===== ELEMENTOS ADICIONAIS ===== */
+/* Links */
+a {
+    color: var(--accent-color) !important;
+}
+
+/* Separadores */
+hr {
+    border-color: var(--bg-tertiary) !important;
+}
+
+/* Tooltips */
+.tooltip {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--bg-tertiary) !important;
+}
+
+/* ===== SCROLLBAR CUSTOMIZADA ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
