@@ -38,36 +38,82 @@ def get_css_theme():
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         
-        /* Sidebar - usando seletores mais específicos */
+        /* SIDEBAR - CORREÇÃO COMPLETA */
+        /* Seletores mais específicos e robustos para o sidebar */
         section[data-testid="stSidebar"] {
             background-color: #262730 !important;
         }
         
-        section[data-testid="stSidebar"] .css-1lcbmhc {
+        /* Título do sidebar */
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] .css-1v0mbdj,
+        section[data-testid="stSidebar"] .css-1v0mbdj p,
+        section[data-testid="stSidebar"] .css-1v0mbdj div {
+            color: #ffffff !important;
             background-color: #262730 !important;
         }
         
-        /* Texto da sidebar */
-        section[data-testid="stSidebar"] .css-1v0mbdj,
-        section[data-testid="stSidebar"] h1,
-        section[data-testid="stSidebar"] h2,
-        section[data-testid="stSidebar"] h3 {
-            color: #ffffff !important;
+        /* Selectbox do sidebar - CORREÇÃO ESPECÍFICA */
+        section[data-testid="stSidebar"] .stSelectbox {
+            background-color: #262730 !important;
         }
         
-        /* Selectbox da sidebar */
+        section[data-testid="stSidebar"] .stSelectbox > div {
+            background-color: #262730 !important;
+        }
+        
         section[data-testid="stSidebar"] .stSelectbox > div > div {
             background-color: #262730 !important;
             color: #ffffff !important;
         }
         
-        /* Toggle da sidebar */
+        section[data-testid="stSidebar"] .stSelectbox > div > div > div {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        section[data-testid="stSidebar"] .stSelectbox > div > div > div > div {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        section[data-testid="stSidebar"] .stSelectbox > div > div > div > div > div {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        /* Labels do selectbox */
+        section[data-testid="stSidebar"] .stSelectbox label {
+            color: #ffffff !important;
+            background-color: #262730 !important;
+        }
+        
+        /* Toggle do sidebar */
+        section[data-testid="stSidebar"] .stToggle {
+            background-color: #262730 !important;
+        }
+        
         section[data-testid="stSidebar"] .stToggle > div > div {
             background-color: #404040 !important;
         }
         
         section[data-testid="stSidebar"] .stToggle > div > div[data-checked="true"] {
             background-color: #00d4ff !important;
+        }
+        
+        /* Separadores do sidebar */
+        section[data-testid="stSidebar"] hr {
+            border-color: #404040 !important;
+            background-color: #262730 !important;
+        }
+        
+        /* Texto do sidebar */
+        section[data-testid="stSidebar"] .stMarkdown,
+        section[data-testid="stSidebar"] .stMarkdown p {
+            color: #ffffff !important;
+            background-color: #262730 !important;
         }
         
         /* Cards de métricas */
@@ -415,6 +461,88 @@ def get_css_theme():
         .stSelectbox *, .stTextInput *, .stNumberInput *, .stTextArea *, .stDateInput * {
             background-color: #262730 !important;
             color: #ffffff !important;
+        }
+        
+        /* CORREÇÃO ESPECÍFICA PARA O MENU DE NAVEGAÇÃO */
+        /* Título "🔧 Controles" */
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3 {
+            color: #00d4ff !important;
+            background-color: #262730 !important;
+            font-weight: bold !important;
+        }
+        
+        /* Label "📱 Navegação:" */
+        section[data-testid="stSidebar"] .stSelectbox label {
+            color: #e0e0e0 !important;
+            background-color: #262730 !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Opções do selectbox */
+        section[data-testid="stSidebar"] .stSelectbox [role="option"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+        }
+        
+        section[data-testid="stSidebar"] .stSelectbox [role="option"]:hover {
+            background-color: #00d4ff !important;
+            color: #000000 !important;
+        }
+        
+        /* Dropdown do selectbox */
+        section[data-testid="stSidebar"] .stSelectbox [role="listbox"] {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+            border: 1px solid #404040 !important;
+        }
+        
+        /* Texto selecionado no selectbox */
+        section[data-testid="stSidebar"] .stSelectbox > div > div > div > div > div {
+            color: #00d4ff !important;
+            background-color: #262730 !important;
+            font-weight: 500 !important;
+        }
+        
+        /* ESTILOS ADICIONAIS PARA GARANTIR CONTRASTE */
+        /* Texto geral do sidebar */
+        section[data-testid="stSidebar"] .css-1v0mbdj {
+            color: #e0e0e0 !important;
+            background-color: #262730 !important;
+        }
+        
+        /* Parágrafos do sidebar */
+        section[data-testid="stSidebar"] p {
+            color: #e0e0e0 !important;
+            background-color: #262730 !important;
+        }
+        
+        /* Divs do sidebar */
+        section[data-testid="stSidebar"] div {
+            background-color: #262730 !important;
+        }
+        
+        /* Elementos específicos do Streamlit no sidebar */
+        section[data-testid="stSidebar"] .stMarkdown {
+            color: #e0e0e0 !important;
+            background-color: #262730 !important;
+        }
+        
+        /* Título principal do sidebar */
+        section[data-testid="stSidebar"] .css-1v0mbdj h1,
+        section[data-testid="stSidebar"] .css-1v0mbdj h2,
+        section[data-testid="stSidebar"] .css-1v0mbdj h3 {
+            color: #00d4ff !important;
+            background-color: #262730 !important;
+            font-weight: bold !important;
+        }
+        
+        /* Separador do sidebar */
+        section[data-testid="stSidebar"] hr {
+            border-color: #404040 !important;
+            background-color: #404040 !important;
+            height: 1px !important;
         }
     </style>
     """
