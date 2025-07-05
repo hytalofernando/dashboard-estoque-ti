@@ -161,6 +161,20 @@ class EstoqueTI:
         """Registra movimentação no histórico"""
         novo_id = self.df_movimentacoes['id'].max() + 1 if not self.df_movimentacoes.empty else 1
         
+        # Obter informações do equipamento para incluir código do produto
+        equipamento_info = self.df_estoque[self.df_estoque['id'] == equipamento_id]
+        codigo_produto = ""
+        if not equipamento_info.empty:
+            codigo_produto = equipamento_info.iloc[0].get('codigo_produto', '')
+        
+        # Adicionar código do produto às observações se disponível
+        observacoes_completas = observacoes
+        if codigo_produto:
+            if observacoes:
+                observacoes_completas = f"{observacoes} | Código: {codigo_produto}"
+            else:
+                observacoes_completas = f"Código: {codigo_produto}"
+        
         nova_movimentacao = {
             'id': novo_id,
             'equipamento_id': equipamento_id,
@@ -168,12 +182,30 @@ class EstoqueTI:
             'quantidade': quantidade,
             'data_movimentacao': datetime.now().strftime('%Y-%m-%d'),
             'destino_origem': destino_origem,
-            'observacoes': observacoes
+            'observacoes': observacoes_completas
         }
         
         self.df_movimentacoes = pd.concat([self.df_movimentacoes, pd.DataFrame([nova_movimentacao])], ignore_index=True)
 
-
+    def aumentar_estoque_equipamento(self, equipamento_id, quantidade, valor_unitario, fornecedor):
+        """Aumenta o estoque de um equipamento existente"""
+        if equipamento_id in self.df_estoque['id'].values:
+            idx = self.df_estoque[self.df_estoque['id'] == equipamento_id].index[0]
+            estoque_atual = self.df_estoque.loc[idx, 'quantidade']
+            
+            if estoque_atual + quantidade <= 1000:
+                self.df_estoque.loc[idx, 'quantidade'] = estoque_atual + quantidade
+                self.df_estoque.loc[idx, 'valor_unitario'] = valor_unitario
+                self.df_estoque.loc[idx, 'fornecedor'] = fornecedor
+                
+                # Registrar movimentação de entrada
+                self.registrar_movimentacao(equipamento_id, 'Entrada', quantidade, f'Fornecedor: {fornecedor}', f'Aumento de estoque')
+                
+                self.save_data()
+                return True
+            else:
+                return False
+        return False
 
 def mostrar_notificacao(tipo, mensagem):
     """Exibe notificação com estilo melhorado para modo escuro"""
@@ -365,39 +397,191 @@ def adicionar_equipamento_page(estoque):
         col1, col2 = st.columns(2)
         
         with col1:
-            equipamento = st.text_input("Nome do Equipamento", placeholder="Ex: Notebook Dell Latitude")
-            categoria = st.selectbox("Categoria", ["Notebook", "Monitor", "Impressora", "Rede", "Servidor", "Periférico", "Outro"])
-            marca = st.text_input("Marca", placeholder="Ex: Dell")
-            modelo = st.text_input("Modelo", placeholder="Ex: Latitude 5520")
+            # Inicializar session_state para autocomplete
+            if 'equipamento_autocomplete' not in st.session_state:
+                st.session_state.equipamento_autocomplete = ""
+            if 'categoria_autocomplete' not in st.session_state:
+                st.session_state.categoria_autocomplete = ""
+            if 'marca_autocomplete' not in st.session_state:
+                st.session_state.marca_autocomplete = ""
+            if 'modelo_autocomplete' not in st.session_state:
+                st.session_state.modelo_autocomplete = ""
+            if 'valor_unitario_autocomplete' not in st.session_state:
+                st.session_state.valor_unitario_autocomplete = 0.01
+            if 'fornecedor_autocomplete' not in st.session_state:
+                st.session_state.fornecedor_autocomplete = ""
+            
+            equipamento = st.text_input("Nome do Equipamento", 
+                                       value=st.session_state.equipamento_autocomplete if st.session_state.equipamento_autocomplete else "",
+                                       placeholder="Ex: Notebook Dell Latitude")
+            categoria = st.selectbox("Categoria", 
+                                   ["Notebook", "Monitor", "Impressora", "Rede", "Servidor", "Periférico", "Outro"],
+                                   index=["Notebook", "Monitor", "Impressora", "Rede", "Servidor", "Periférico", "Outro"].index(st.session_state.categoria_autocomplete) if st.session_state.categoria_autocomplete in ["Notebook", "Monitor", "Impressora", "Rede", "Servidor", "Periférico", "Outro"] else 0)
+            marca = st.text_input("Marca", 
+                                 value=st.session_state.marca_autocomplete if st.session_state.marca_autocomplete else "",
+                                 placeholder="Ex: Dell")
+            modelo = st.text_input("Modelo", 
+                                  value=st.session_state.modelo_autocomplete if st.session_state.modelo_autocomplete else "",
+                                  placeholder="Ex: Latitude 5520")
+            
+            # Sugestão automática de código baseada na categoria e marca
+            codigo_sugerido = ""
+            if categoria and marca:
+                if categoria == 'Notebook':
+                    prefixo = 'NB'
+                elif categoria == 'Monitor':
+                    prefixo = 'MON'
+                elif categoria == 'Impressora':
+                    prefixo = 'IMP'
+                elif categoria == 'Rede':
+                    prefixo = 'SW'
+                elif categoria == 'Servidor':
+                    prefixo = 'SRV'
+                elif categoria == 'Periférico':
+                    prefixo = 'PER'
+                else:
+                    prefixo = 'OUT'
+                
+                # Contar equipamentos existentes da mesma categoria/marca
+                equipamentos_similares = estoque.df_estoque[
+                    (estoque.df_estoque['categoria'] == categoria) & 
+                    (estoque.df_estoque['marca'] == marca)
+                ]
+                numero = len(equipamentos_similares) + 1
+                codigo_sugerido = f"{prefixo}-{marca.upper()}-{numero:03d}"
+            
             codigo_produto = st.text_input("Código do Produto", placeholder="Ex: NB-DELL-001")
         
         with col2:
-            quantidade = st.number_input("Quantidade", min_value=1, value=1)
-            valor_unitario = st.number_input("Valor Unitário (R$)", min_value=0.0, value=0.0, step=0.01)
-            fornecedor = st.text_input("Fornecedor", placeholder="Ex: Dell Brasil")
+            quantidade = st.number_input("Quantidade", min_value=1, max_value=1000, value=1, help="Máximo 1000 unidades por vez")
+            valor_unitario = st.number_input("Valor Unitário (R$)", 
+                                            min_value=0.01, 
+                                            value=st.session_state.valor_unitario_autocomplete if st.session_state.valor_unitario_autocomplete > 0.01 else 0.01, 
+                                            step=0.01, 
+                                            help="Valor mínimo R$ 0,01")
+            fornecedor = st.text_input("Fornecedor", 
+                                      value=st.session_state.fornecedor_autocomplete if st.session_state.fornecedor_autocomplete else "",
+                                      placeholder="Ex: Dell Brasil")
+        
+        # Autocomplete inteligente - verificar se código já existe
+        equipamento_existente = None
+        if codigo_produto and len(codigo_produto.strip()) > 0:
+            if codigo_produto in estoque.df_estoque['codigo_produto'].values:
+                equipamento_existente = estoque.df_estoque[estoque.df_estoque['codigo_produto'] == codigo_produto].iloc[0]
+                
+                # Mostrar alerta de produto encontrado
+                st.success(f"🎯 **Produto encontrado no sistema!**")
+                st.info(f"**Produto:** {equipamento_existente['equipamento']}")
+                st.info(f"**Quantidade atual:** {equipamento_existente['quantidade']} unidades")
+                st.info(f"**Valor unitário atual:** R$ {equipamento_existente['valor_unitario']:,.2f}")
+                
+                # Perguntar se quer usar dados do produto existente
+                usar_dados_existentes = st.checkbox("✅ Usar dados do produto existente (recomendado)", value=True)
+                
+                if usar_dados_existentes:
+                    # Preencher automaticamente os campos com dados do produto existente
+                    st.session_state.equipamento_autocomplete = equipamento_existente['equipamento']
+                    st.session_state.categoria_autocomplete = equipamento_existente['categoria']
+                    st.session_state.marca_autocomplete = equipamento_existente['marca']
+                    st.session_state.modelo_autocomplete = equipamento_existente['modelo']
+                    st.session_state.valor_unitario_autocomplete = equipamento_existente['valor_unitario']
+                    st.session_state.fornecedor_autocomplete = equipamento_existente['fornecedor']
+                    
+                    st.success("✅ Campos preenchidos automaticamente! Apenas ajuste a quantidade.")
+                else:
+                    st.warning("⚠️ Você pode editar os campos manualmente se necessário.")
         
         # Mostrar valor total calculado
         if valor_unitario > 0 and quantidade > 0:
             valor_total = valor_unitario * quantidade
             st.markdown(f"**💰 Valor Total:** R$ {valor_total:,.2f}")
+            
+            # Alertas de valor
+            if valor_total > 100000:
+                st.warning("⚠️ Valor total muito alto! Verifique os valores inseridos.")
+            elif valor_total < 10:
+                st.info("ℹ️ Valor total baixo. Confirme se os valores estão corretos.")
         
-        submitted = st.form_submit_button("✅ Adicionar ao Estoque")
+        # Validações antes do submit
+        erros = []
+        
+        if codigo_produto:
+            # Verificar se código já existe
+            if codigo_produto in estoque.df_estoque['codigo_produto'].values:
+                if equipamento_existente is not None:
+                    # Se produto existe, permitir aumentar estoque
+                    st.success("✅ Produto será atualizado com nova quantidade")
+                else:
+                    erros.append("❌ Código do produto já existe no estoque")
+            
+            # Validar formato do código
+            if not codigo_produto.strip():
+                erros.append("❌ Código do produto não pode estar vazio")
+            elif len(codigo_produto) < 3:
+                erros.append("❌ Código do produto deve ter pelo menos 3 caracteres")
+        
+        if valor_unitario <= 0:
+            erros.append("❌ Valor unitário deve ser maior que zero")
+        
+        if quantidade <= 0:
+            erros.append("❌ Quantidade deve ser maior que zero")
+        
+        if quantidade > 1000:
+            erros.append("❌ Quantidade máxima permitida é 1000 unidades")
+        
+        # Mostrar erros se houver
+        if erros:
+            st.error("**Erros encontrados:**")
+            for erro in erros:
+                st.error(erro)
+        
+        submitted = st.form_submit_button("✅ Adicionar ao Estoque", disabled=len(erros) > 0)
         
         if submitted:
-            if equipamento and marca and modelo and codigo_produto and fornecedor:
-                success = estoque.adicionar_equipamento(
-                    equipamento, categoria, marca, modelo, codigo_produto, quantidade, valor_unitario, fornecedor
-                )
-                if success:
-                    st.session_state.form_message = f"✅ Equipamento '{equipamento}' adicionado com sucesso! (Qtd: {quantidade})"
-                    st.session_state.form_message_type = "success"
-                    st.rerun()
+            if equipamento and marca and modelo and codigo_produto and fornecedor and valor_unitario > 0:
+                if equipamento_existente is not None:
+                    # Atualizar estoque do produto existente
+                    success = estoque.aumentar_estoque_equipamento(
+                        equipamento_existente['id'], quantidade, valor_unitario, fornecedor
+                    )
+                    if success:
+                        nova_quantidade = equipamento_existente['quantidade'] + quantidade
+                        st.session_state.form_message = f"✅ Estoque do produto '{equipamento_existente['equipamento']}' aumentado com sucesso! (Nova quantidade: {nova_quantidade}, Adicionado: {quantidade})"
+                        st.session_state.form_message_type = "success"
+                        # Limpar autocomplete após sucesso
+                        st.session_state.equipamento_autocomplete = ""
+                        st.session_state.categoria_autocomplete = ""
+                        st.session_state.marca_autocomplete = ""
+                        st.session_state.modelo_autocomplete = ""
+                        st.session_state.valor_unitario_autocomplete = 0.01
+                        st.session_state.fornecedor_autocomplete = ""
+                        st.rerun()
+                    else:
+                        st.session_state.form_message = "❌ Erro ao aumentar estoque do produto"
+                        st.session_state.form_message_type = "error"
+                        st.rerun()
                 else:
-                    st.session_state.form_message = "❌ Erro ao adicionar equipamento"
-                    st.session_state.form_message_type = "error"
-                    st.rerun()
+                    # Criar novo equipamento
+                    success = estoque.adicionar_equipamento(
+                        equipamento, categoria, marca, modelo, codigo_produto, quantidade, valor_unitario, fornecedor
+                    )
+                    if success:
+                        st.session_state.form_message = f"✅ Equipamento '{equipamento}' adicionado com sucesso! (Qtd: {quantidade}, Valor: R$ {valor_total:,.2f})"
+                        st.session_state.form_message_type = "success"
+                        # Limpar autocomplete após sucesso
+                        st.session_state.equipamento_autocomplete = ""
+                        st.session_state.categoria_autocomplete = ""
+                        st.session_state.marca_autocomplete = ""
+                        st.session_state.modelo_autocomplete = ""
+                        st.session_state.valor_unitario_autocomplete = 0.01
+                        st.session_state.fornecedor_autocomplete = ""
+                        st.rerun()
+                    else:
+                        st.session_state.form_message = "❌ Erro ao adicionar equipamento"
+                        st.session_state.form_message_type = "error"
+                        st.rerun()
             else:
-                st.session_state.form_message = "⚠️ Preencha todos os campos obrigatórios"
+                st.session_state.form_message = "⚠️ Preencha todos os campos obrigatórios e verifique os valores"
                 st.session_state.form_message_type = "warning"
                 st.rerun()
 
@@ -444,40 +628,78 @@ def remover_equipamento_page(estoque):
         equipamento_id = st.selectbox(
             "Selecione o Equipamento",
             options=equipamentos_disponiveis['id'].tolist(),
-            format_func=lambda x: f"{equipamentos_disponiveis[equipamentos_disponiveis['id'] == x]['equipamento'].iloc[0]} - Qtd: {equipamentos_disponiveis[equipamentos_disponiveis['id'] == x]['quantidade'].iloc[0]}"
+            format_func=lambda x: f"{equipamentos_disponiveis[equipamentos_disponiveis['id'] == x]['equipamento'].iloc[0]} - {equipamentos_disponiveis[equipamentos_disponiveis['id'] == x]['codigo_produto'].iloc[0]} - Qtd: {equipamentos_disponiveis[equipamentos_disponiveis['id'] == x]['quantidade'].iloc[0]}"
         )
         
-        equipamento_selecionado = equipamentos_disponiveis[equipamentos_disponiveis['id'] == equipamento_id].iloc[0]
-        quantidade_maxima = equipamento_selecionado['quantidade']
-        
-        quantidade = st.number_input("Quantidade a Remover", min_value=1, max_value=quantidade_maxima, value=1)
-        destino = st.text_input("Destino", placeholder="Ex: Loja Shopping Center")
-        observacoes = st.text_area("Observações", placeholder="Ex: Transferência para nova loja")
-        
-        # Mostrar informações do equipamento selecionado
+        # Obter informações do equipamento selecionado
         if equipamento_id:
-            st.markdown(f"**📦 Equipamento Selecionado:** {equipamento_selecionado['equipamento']}")
-            st.markdown(f"**🏷️ Código:** {equipamento_selecionado.get('codigo_produto', 'N/A')}")
-            st.markdown(f"**💰 Valor Unitário:** R$ {equipamento_selecionado['valor_unitario']:,.2f}")
-            st.markdown(f"**📊 Quantidade Disponível:** {quantidade_maxima}")
-        
-        submitted = st.form_submit_button("❌ Remover do Estoque")
-        
-        if submitted:
-            if destino:
-                success = estoque.remover_equipamento(equipamento_id, quantidade, destino, observacoes)
-                if success:
-                    st.session_state.remove_form_message = f"✅ Equipamento removido com sucesso! (Qtd: {quantidade})"
-                    st.session_state.remove_form_message_type = "success"
-                    st.rerun()
+            equipamento_selecionado = equipamentos_disponiveis[equipamentos_disponiveis['id'] == equipamento_id].iloc[0]
+            quantidade_maxima = equipamento_selecionado['quantidade']
+            
+            quantidade = st.number_input("Quantidade a Remover", min_value=1, max_value=quantidade_maxima, value=1, help=f"Máximo {quantidade_maxima} unidades disponíveis")
+            
+            # Campo para código do produto que está saindo
+            codigo_saida = st.text_input("Código do Produto", 
+                                         placeholder="Ex: PROD-001-2024",
+                                         help="Código específico do produto que está saindo")
+            
+            destino = st.text_input("Destino", placeholder="Ex: Loja Shopping Center")
+            observacoes = st.text_area("Observações", placeholder="Ex: Transferência para nova loja")
+            
+            # Mostrar valor total que será removido
+            if quantidade > 0:
+                valor_total_removido = quantidade * equipamento_selecionado['valor_unitario']
+                st.markdown(f"**💰 Valor Total a Remover:** R$ {valor_total_removido:,.2f}")
+            
+            # Validações antes do submit
+            erros = []
+            
+            if quantidade <= 0:
+                erros.append("❌ Quantidade deve ser maior que zero")
+            
+            # Confirmação para grandes quantidades (apenas um alerta)
+            if quantidade > quantidade_maxima * 0.8:  # Mais de 80% do estoque
+                st.error("⚠️ ATENÇÃO: Você está removendo mais de 80% do estoque!")
+                st.error("Confirme se esta operação está correta antes de continuar.")
+            elif quantidade > quantidade_maxima * 0.5:  # Mais de 50% do estoque
+                st.warning(f"⚠️ Você está removendo {quantidade} de {quantidade_maxima} unidades ({quantidade/quantidade_maxima*100:.1f}% do estoque)")
+            
+            # Mostrar erros se houver
+            if erros:
+                st.error("**Erros encontrados:**")
+                for erro in erros:
+                    st.error(erro)
+            
+            submitted = st.form_submit_button("❌ Remover do Estoque", disabled=len(erros) > 0)
+            
+            if submitted:
+                if quantidade <= quantidade_maxima:
+                    # Incluir código do produto nas observações se fornecido
+                    observacoes_completas = observacoes
+                    if codigo_saida and len(codigo_saida.strip()) > 0:
+                        if observacoes:
+                            observacoes_completas = f"{observacoes} | Código Saída: {codigo_saida.strip()}"
+                        else:
+                            observacoes_completas = f"Código Saída: {codigo_saida.strip()}"
+                    
+                    # Usar destino se fornecido, senão usar valor padrão
+                    destino_final = destino if destino and len(destino.strip()) > 0 else "Não especificado"
+                    
+                    success = estoque.remover_equipamento(equipamento_id, quantidade, destino_final, observacoes_completas)
+                    if success:
+                        valor_removido = quantidade * equipamento_selecionado['valor_unitario']
+                        codigo_produto = equipamento_selecionado.get('codigo_produto', 'N/A')
+                        st.session_state.remove_form_message = f"✅ Equipamento removido com sucesso! (Código: {codigo_produto}, Qtd: {quantidade}, Valor: R$ {valor_removido:,.2f})"
+                        st.session_state.remove_form_message_type = "success"
+                        st.rerun()
+                    else:
+                        st.session_state.remove_form_message = "❌ Erro ao remover equipamento"
+                        st.session_state.remove_form_message_type = "error"
+                        st.rerun()
                 else:
-                    st.session_state.remove_form_message = "❌ Erro ao remover equipamento"
-                    st.session_state.remove_form_message_type = "error"
+                    st.session_state.remove_form_message = "⚠️ Verifique os dados inseridos"
+                    st.session_state.remove_form_message_type = "warning"
                     st.rerun()
-            else:
-                st.session_state.remove_form_message = "⚠️ Preencha o campo de destino"
-                st.session_state.remove_form_message_type = "warning"
-                st.rerun()
 
 def historico_movimentacoes_page(estoque):
     """Página com histórico de movimentações"""
@@ -507,7 +729,7 @@ def historico_movimentacoes_page(estoque):
     
     # Adicionar informações do equipamento
     df_filtrado = df_filtrado.merge(
-        estoque.df_estoque[['id', 'equipamento', 'categoria']],
+        estoque.df_estoque[['id', 'equipamento', 'categoria', 'codigo_produto']],
         left_on='equipamento_id',
         right_on='id',
         suffixes=('', '_equip')
@@ -527,7 +749,14 @@ def historico_movimentacoes_page(estoque):
     
     # Tabela de movimentações
     st.markdown("### 📊 Detalhes das Movimentações")
-    df_display = df_filtrado[['data_movimentacao', 'equipamento', 'categoria', 'tipo_movimentacao', 'quantidade', 'destino_origem', 'observacoes']].sort_values('data_movimentacao', ascending=False)
+    
+    # Preparar colunas para exibição
+    colunas_exibicao = ['data_movimentacao', 'equipamento', 'categoria', 'tipo_movimentacao', 'quantidade', 'destino_origem', 'observacoes']
+    if 'codigo_produto' in df_filtrado.columns:
+        # Inserir código do produto após o equipamento
+        colunas_exibicao.insert(2, 'codigo_produto')
+    
+    df_display = df_filtrado[colunas_exibicao].sort_values('data_movimentacao', ascending=False)
     
     st.dataframe(df_display, use_container_width=True)
 
