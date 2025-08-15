@@ -15,6 +15,10 @@ from config.settings import settings
 from services.estoque_service import EstoqueService
 from utils.ui_utils import show_toast, show_error_message
 
+# ✅ SISTEMA DE AUTENTICAÇÃO
+from auth.auth_service import auth_service
+from pages.login_page import render_login_page
+
 # Configuração da página
 st.set_page_config(
     page_title=settings.PAGE_TITLE,
@@ -190,11 +194,43 @@ def render_header():
             """
             <div style="text-align: center; color: #e0e0e0; margin-bottom: 2rem;">
                 <p><strong>Sistema Moderno de Gerenciamento de Estoque</strong></p>
-                <p>Tecnologia: Streamlit 1.42+ | Plotly 5.21+ | Pandas 2.2+</p>
+                <p>Tecnologia: Streamlit 1.42+ | Plotly 5.21+ | Pandas 2.2+ | Auth 🔐</p>
             </div>
             """, 
             unsafe_allow_html=True
         )
+
+def render_user_info_sidebar():
+    """Renderiza informações do usuário na sidebar"""
+    if auth_service.is_authenticated():
+        user = auth_service.get_current_user()
+        
+        st.sidebar.markdown("---")
+        st.sidebar.markdown("### 👤 Usuário Conectado")
+        
+        # Informações do usuário
+        if user.profile == "administrador":
+            profile_icon = "👑"
+            profile_color = "🟢"
+        else:
+            profile_icon = "👀"
+            profile_color = "🔵"
+        
+        st.sidebar.markdown(f"**{profile_icon} {user.display_name}**")
+        st.sidebar.markdown(f"{profile_color} {user.profile.title()}")
+        
+        # Permissões
+        can_edit = auth_service.can_edit()
+        edit_status = "✅ Pode editar" if can_edit else "👀 Somente leitura"
+        st.sidebar.markdown(f"**Permissões:** {edit_status}")
+        
+        # Botão de logout
+        if st.sidebar.button("🚪 Logout", use_container_width=True):
+            auth_service.logout()
+            show_toast("👋 Logout realizado!", "🚪")
+            st.rerun()
+        
+        st.sidebar.markdown("---")
 
 def main():
     """Função principal da aplicação"""
@@ -202,6 +238,13 @@ def main():
         # Carregar CSS moderno
         load_modern_css()
         
+        # ✅ VERIFICAR AUTENTICAÇÃO PRIMEIRO
+        if not auth_service.is_authenticated():
+            # Renderizar página de login se não estiver autenticado
+            render_login_page()
+            return
+        
+        # ✅ USUÁRIO AUTENTICADO - RENDERIZAR DASHBOARD
         # Renderizar header
         render_header()
         
@@ -210,46 +253,52 @@ def main():
         if not estoque_service:
             st.stop()
         
-        # Configurar sidebar
+        # Configurar sidebar com informações do usuário
         st.sidebar.title("🔧 Controles")
-        st.sidebar.markdown("---")
+        render_user_info_sidebar()
         
-        # Obter páginas ativas das configurações
+        # ✅ OBTER PÁGINAS FILTRADAS POR PERMISSÕES
+        paginas_filtradas = auth_service.get_filtered_pages()
         paginas_ativas = [
-            info["titulo"] for key, info in settings.PAGINAS_ATIVAS.items() 
-            if info["ativa"]
+            info["titulo"] for key, info in paginas_filtradas.items()
         ]
         
-        # Navegação dinâmica baseada em configurações
+        if not paginas_ativas:
+            st.error("❌ Nenhuma página disponível para seu perfil.")
+            st.stop()
+        
+        # Navegação dinâmica baseada em permissões
         selected_page = st.sidebar.selectbox(
             "📱 Navegação:",
             paginas_ativas
         )
         
-        # Adicionar controle de páginas para administradores
-        with st.sidebar.expander("⚙️ Configurar Páginas"):
-            st.markdown("**Ativar/Desativar Páginas:**")
-            for key, info in settings.PAGINAS_ATIVAS.items():
-                current_state = st.checkbox(
-                    info["titulo"], 
-                    value=info["ativa"],
-                    key=f"page_{key}",
-                    help=info["descricao"]
-                )
-                # Atualizar configuração em tempo real
-                settings.PAGINAS_ATIVAS[key]["ativa"] = current_state
+        # ✅ CONTROLE DE PÁGINAS APENAS PARA ADMINISTRADORES
+        if auth_service.has_permission("configuracoes"):
+            with st.sidebar.expander("⚙️ Configurar Páginas"):
+                st.markdown("**Ativar/Desativar Páginas:**")
+                for key, info in settings.PAGINAS_ATIVAS.items():
+                    current_state = st.checkbox(
+                        info["titulo"], 
+                        value=info["ativa"],
+                        key=f"page_{key}",
+                        help=info["descricao"]
+                    )
+                    # Atualizar configuração em tempo real
+                    settings.PAGINAS_ATIVAS[key]["ativa"] = current_state
         
         st.sidebar.markdown("---")
         
         # Informações da sidebar
         with st.sidebar.expander("ℹ️ Informações do Sistema"):
             st.markdown("""
-            **Versão:** 2.0.0 Moderna  
+            **Versão:** 2.0.0 Moderna + Auth 🔐  
             **Tecnologias:**
             - Streamlit 1.42+
             - Plotly 5.21+ 
             - Pandas 2.2+
             - Pydantic 2.5+
+            - Sistema de Autenticação
             
             **Recursos Modernos:**
             - Interface responsiva
@@ -257,12 +306,18 @@ def main():
             - Gráficos com bordas arredondadas
             - Validação de dados
             - Logs estruturados
+            - Sistema de login seguro
             """)
             
-            # Estatísticas das páginas
+            # ✅ Estatísticas das páginas baseadas em permissões
             total_paginas = len(settings.PAGINAS_ATIVAS)
-            paginas_ativas_count = len([p for p in settings.PAGINAS_ATIVAS.values() if p["ativa"]])
-            st.markdown(f"**📊 Páginas:** {paginas_ativas_count}/{total_paginas} ativas")
+            paginas_disponiveis = len(paginas_filtradas)
+            st.markdown(f"**📊 Páginas:** {paginas_disponiveis}/{total_paginas} disponíveis")
+            
+            # ✅ Informações do usuário
+            user = auth_service.get_current_user()
+            st.markdown(f"**👤 Usuário:** {user.username}")
+            st.markdown(f"**🔐 Perfil:** {user.profile.title()}")
         
         # Status da página atual
         st.sidebar.markdown("---")
