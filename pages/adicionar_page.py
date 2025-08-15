@@ -20,6 +20,9 @@ from utils.ui_utils import (
     create_info_cards, normalizar_status_equipamento, render_status_badge
 )
 
+# ✅ SISTEMA DE AUTENTICAÇÃO
+from auth.auth_service import auth_service
+
 class AdicionarEquipamentoProfessional:
     """Página Profissional para Adicionar Equipamentos com Tecnologias de Ponta"""
     
@@ -47,6 +50,21 @@ class AdicionarEquipamentoProfessional:
     
     def render(self) -> None:
         """Renderiza a página moderna e profissional"""
+        # ✅ VERIFICAR PERMISSÕES PRIMEIRO
+        if not auth_service.can_edit():
+            st.error("🚫 **Acesso Negado**")
+            st.warning("⚠️ **Visualizadores não podem adicionar equipamentos.**")
+            st.info("💡 **Apenas Administradores podem realizar esta operação.**")
+            
+            # Mostrar informações do usuário atual
+            user = auth_service.get_current_user()
+            st.markdown(f"**👤 Usuário atual:** {user.display_name} ({user.profile.title()})")
+            
+            # Botão para voltar ao dashboard
+            if st.button("📊 Voltar ao Dashboard", type="primary"):
+                st.switch_page("app.py")
+            return
+        
         # Header profissional
         create_form_section(
             "📦 Adicionar Equipamentos - Sistema Profissional v3.0",

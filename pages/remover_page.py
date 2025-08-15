@@ -18,6 +18,9 @@ from utils.ui_utils import (
 )
 from config.settings import settings
 
+# ✅ SISTEMA DE AUTENTICAÇÃO
+from auth.auth_service import auth_service
+
 class RemoverEquipamentoPageProfessional:
     """Página Profissional para Remover Equipamentos com Tecnologias Modernas"""
     
@@ -26,6 +29,21 @@ class RemoverEquipamentoPageProfessional:
     
     def render(self) -> None:
         """Renderiza a página moderna de remover equipamentos"""
+        # ✅ VERIFICAR PERMISSÕES PRIMEIRO
+        if not auth_service.can_edit():
+            st.error("🚫 **Acesso Negado**")
+            st.warning("⚠️ **Visualizadores não podem remover equipamentos.**")
+            st.info("💡 **Apenas Administradores podem realizar esta operação.**")
+            
+            # Mostrar informações do usuário atual
+            user = auth_service.get_current_user()
+            st.markdown(f"**👤 Usuário atual:** {user.display_name} ({user.profile.title()})")
+            
+            # Botão para voltar ao dashboard
+            if st.button("📊 Voltar ao Dashboard", type="primary"):
+                st.switch_page("app.py")
+            return
+        
         create_form_section(
             "🗑️ Remover Equipamentos - Sistema Profissional",
             "Remova equipamentos com busca inteligente, filtros avançados e operações em lote"
