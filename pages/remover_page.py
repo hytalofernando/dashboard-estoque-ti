@@ -94,7 +94,8 @@ class RemoverEquipamentoPageProfessional:
             try:
                 logger.info("🔄 Carregando cache de equipamentos para remoção...")
                 
-                # ✅ SEMPRE BUSCAR DADOS FRESCOS DO BANCO
+                # ✅ SEMPRE BUSCAR DADOS FRESCOS DO BANCO COM RECARREGAMENTO
+                self.estoque_service.recarregar_dados()  # ✅ FORÇAR RECARREGAMENTO DO EXCEL
                 df_estoque = self.estoque_service.obter_equipamentos()
                 df_disponivel = df_estoque[df_estoque['quantidade'] > 0]
                 
@@ -148,6 +149,8 @@ class RemoverEquipamentoPageProfessional:
     def _get_equipamentos_disponiveis(self) -> pd.DataFrame:
         """Obtém equipamentos disponíveis com filtros aplicados"""
         try:
+            # ✅ SEMPRE RECARREGAR DADOS DO EXCEL PARA GARANTIR CONSISTÊNCIA
+            self.estoque_service.recarregar_dados()
             df_estoque = self.estoque_service.obter_equipamentos()
             df_disponivel = df_estoque[df_estoque['quantidade'] > 0].copy()
             
@@ -854,6 +857,8 @@ class RemoverEquipamentoPageProfessional:
                 
                 # Recarregar dados do banco para verificar
                 try:
+                    # ✅ FORÇAR RECARREGAMENTO DO EXCEL ANTES DE VERIFICAR
+                    self.estoque_service.recarregar_dados()
                     df_atualizado = self.estoque_service.obter_equipamentos()
                     equipamento_atualizado = df_atualizado[df_atualizado['id'] == equipamento['id']]
                     
@@ -897,6 +902,11 @@ class RemoverEquipamentoPageProfessional:
                 st.session_state['historico_cache_invalidated'] = True
                 st.session_state['cache_remover_invalidated'] = True
                 st.session_state['cache_invalidated'] = True  # Cache geral
+                
+                # ✅ FORÇAR INVALIDAÇÃO DO CACHE DE EQUIPAMENTOS
+                cache_key = f"equipamentos_cache_remover_{datetime.now().strftime('%Y%m%d')}"
+                if cache_key in st.session_state:
+                    del st.session_state[cache_key]
                 
                 # ✅ LIMPAR CACHE DO STREAMLIT SE DISPONÍVEL
                 if hasattr(st, 'cache_data'):
