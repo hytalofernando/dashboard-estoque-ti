@@ -66,8 +66,8 @@ class EstoqueService:
                     message=f"Código '{equipamento.codigo_produto}' já existe"
                 )
             
-            # Gerar novo ID
-            novo_id = self.df_estoque['id'].max() + 1 if not self.df_estoque.empty else 1
+            # Gerar novo ID (converter para int Python nativo)
+            novo_id = int(self.df_estoque['id'].max() + 1) if not self.df_estoque.empty else 1
             equipamento.id = novo_id
             
             # Adicionar ao DataFrame
@@ -80,7 +80,7 @@ class EstoqueService:
             # Registrar movimentação de entrada
             movimentacao = Movimentacao(
                 equipamento_id=novo_id,
-                tipo_movimentacao="Entrada",  # ✅ String simples em vez de TipoMovimentacao.ENTRADA
+                tipo_movimentacao=TipoMovimentacao.ENTRADA,
                 quantidade=equipamento.quantidade,
                 destino_origem=f"Fornecedor: {equipamento.fornecedor}",
                 observacoes=f"Adição inicial ao estoque | Código: {equipamento.codigo_produto}",
@@ -147,7 +147,7 @@ class EstoqueService:
             # Registrar movimentação
             movimentacao = Movimentacao(
                 equipamento_id=equipamento_id,
-                tipo_movimentacao="Entrada",  # ✅ String simples
+                tipo_movimentacao=TipoMovimentacao.ENTRADA,
                 quantidade=quantidade,
                 destino_origem=f"Fornecedor: {fornecedor}",
                 observacoes=f"Aumento de estoque | Código: {equipamento['codigo_produto']}",
@@ -163,7 +163,7 @@ class EstoqueService:
                 return EquipamentoResponse(
                     success=True,
                     message=f"Estoque aumentado com sucesso! Nova quantidade: {nova_quantidade}",
-                    nova_quantidade=nova_quantidade
+                    nova_quantidade=int(nova_quantidade)
                 )
             else:
                 return EquipamentoResponse(
@@ -197,8 +197,8 @@ class EstoqueService:
             idx = self.df_estoque[self.df_estoque['id'] == equipamento_id].index[0]
             nova_quantidade = equipamento['quantidade'] - quantidade
             
-            # Atualizar quantidade
-            self.df_estoque.loc[idx, 'quantidade'] = nova_quantidade
+            # Atualizar quantidade (converter para int Python nativo)
+            self.df_estoque.loc[idx, 'quantidade'] = int(nova_quantidade)
             
             # Atualizar status se necessário
             if nova_quantidade == 0:
@@ -209,7 +209,7 @@ class EstoqueService:
             
             movimentacao = Movimentacao(
                 equipamento_id=equipamento_id,
-                tipo_movimentacao="Saída",  # ✅ String simples
+                tipo_movimentacao=TipoMovimentacao.SAIDA,
                 quantidade=quantidade,
                 destino_origem=destino,
                 observacoes=observacoes_completas,
@@ -226,7 +226,7 @@ class EstoqueService:
                 return EquipamentoResponse(
                     success=True,
                     message=f"Equipamento removido com sucesso! Quantidade: {quantidade}, Valor: R$ {valor_total:,.2f}",
-                    nova_quantidade=nova_quantidade
+                    nova_quantidade=int(nova_quantidade)
                 )
             else:
                 return EquipamentoResponse(

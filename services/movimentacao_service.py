@@ -18,8 +18,8 @@ class MovimentacaoService:
     def registrar_movimentacao(self, movimentacao: Movimentacao) -> MovimentacaoResponse:
         """Registra nova movimentação"""
         try:
-            # Gerar novo ID
-            novo_id = self.df_movimentacoes['id'].max() + 1 if not self.df_movimentacoes.empty else 1
+            # Gerar novo ID (converter para int Python nativo)
+            novo_id = int(self.df_movimentacoes['id'].max() + 1) if not self.df_movimentacoes.empty else 1
             movimentacao.id = novo_id
             
             # Adicionar ao DataFrame
