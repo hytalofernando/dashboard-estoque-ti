@@ -40,14 +40,55 @@ class Settings(BaseSettings):
     MIN_VALOR: float = 0.01
     MAX_OBSERVACOES: int = 500
     
-    # Configurações visuais
+    # Configurações visuais expandidas
     THEME_COLORS: Dict[str, str] = {
+        # Cores principais
         "primary": "#00d4ff",
-        "success": "#4ade80", 
+        "primary_hover": "#00bde6",
+        "primary_light": "#33ddff",
+        
+        # Cores funcionais
+        "success": "#4ade80",
+        "success_light": "#6ee7b7",
         "warning": "#fbbf24",
+        "warning_light": "#fcd34d",
         "error": "#f87171",
-        "background": "#0e1117"
+        "error_light": "#fca5a5",
+        "info": "#60a5fa",
+        "info_light": "#93c5fd",
+        
+        # Cores de status semânticas
+        "status_available": "#10b981",
+        "status_unavailable": "#ef4444", 
+        "status_maintenance": "#f59e0b",
+        "status_pending": "#6366f1",
+        
+        # Cores de fundo
+        "background": "#0e1117",
+        "background_secondary": "#262730",
+        "background_tertiary": "#404040",
+        "background_card": "#1a1d23",
+        
+        # Cores de texto
+        "text_primary": "#ffffff",
+        "text_secondary": "#f0f0f0",
+        "text_tertiary": "#c1c7cd",
+        "text_muted": "#8b949e"
     }
+    
+    # Paleta de cores para gráficos (harmonizada com o tema)
+    CHART_COLORS: List[str] = [
+        "#00d4ff",  # Azul ciano principal
+        "#4ade80",  # Verde sucesso
+        "#fbbf24",  # Amarelo aviso
+        "#f87171",  # Vermelho erro
+        "#60a5fa",  # Azul informativo
+        "#a78bfa",  # Roxo
+        "#fb7185",  # Rosa
+        "#34d399",  # Verde claro
+        "#fcd34d",  # Amarelo claro
+        "#f472b6"   # Rosa claro
+    ]
     
     # Configurações de páginas ativas - MODO DASHBOARD ÚNICO
     PAGINAS_ATIVAS: Dict[str, Dict[str, Any]] = {
