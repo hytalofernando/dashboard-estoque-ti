@@ -8,45 +8,72 @@ from typing import Dict, Any, List, Optional
 from config.settings import settings
 
 def get_plotly_theme() -> Dict[str, Any]:
-    """Retorna tema moderno do Plotly para modo escuro"""
+    """Retorna tema moderno do Plotly harmonizado com o design system"""
     return {
         'layout': {
             'plot_bgcolor': settings.THEME_COLORS["background"],
             'paper_bgcolor': settings.THEME_COLORS["background"],
-            'font': {'color': '#fafafa', 'family': 'Arial, sans-serif'},
-            'colorway': ['#00d4ff', '#4ade80', '#fbbf24', '#f87171', '#a78bfa', '#fb7185'],
+            'font': {
+                'color': settings.THEME_COLORS["text_secondary"], 
+                'family': 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+                'size': 12
+            },
+            'colorway': settings.CHART_COLORS,
+            'title': {
+                'font': {
+                    'color': settings.THEME_COLORS["text_primary"],
+                    'size': 16,
+                    'family': 'Inter, sans-serif'
+                },
+                'x': 0.5,
+                'xanchor': 'center'
+            },
             'xaxis': {
-                'gridcolor': '#404040',
-                'linecolor': '#404040',
-                'tickfont': {'color': '#fafafa'},
+                'gridcolor': settings.THEME_COLORS["background_tertiary"],
+                'linecolor': settings.THEME_COLORS["background_tertiary"],
+                'tickfont': {'color': settings.THEME_COLORS["text_tertiary"]},
                 'showgrid': True,
-                'gridwidth': 1
+                'gridwidth': 1,
+                'zeroline': False,
+                'title': {'font': {'color': settings.THEME_COLORS["text_secondary"]}}
             },
             'yaxis': {
-                'gridcolor': '#404040',
-                'linecolor': '#404040',
-                'tickfont': {'color': '#fafafa'},
+                'gridcolor': settings.THEME_COLORS["background_tertiary"],
+                'linecolor': settings.THEME_COLORS["background_tertiary"],
+                'tickfont': {'color': settings.THEME_COLORS["text_tertiary"]},
                 'showgrid': True,
-                'gridwidth': 1
+                'gridwidth': 1,
+                'zeroline': False,
+                'title': {'font': {'color': settings.THEME_COLORS["text_secondary"]}}
             },
-            'margin': {'l': 40, 'r': 40, 't': 60, 'b': 40},
+            'margin': {'l': 50, 'r': 30, 't': 80, 'b': 50},
             'showlegend': True,
             'legend': {
-                'bgcolor': 'rgba(0,0,0,0)',
-                'bordercolor': '#404040',
-                'borderwidth': 1
+                'bgcolor': 'rgba(26, 29, 35, 0.8)',
+                'bordercolor': settings.THEME_COLORS["background_tertiary"],
+                'borderwidth': 1,
+                'font': {'color': settings.THEME_COLORS["text_secondary"]},
+                'orientation': 'v',
+                'x': 1.02,
+                'y': 1
+            },
+            'hovermode': 'closest',
+            'hoverlabel': {
+                'bgcolor': settings.THEME_COLORS["background_card"],
+                'bordercolor': settings.THEME_COLORS["primary"],
+                'font': {'color': settings.THEME_COLORS["text_primary"]}
             }
         }
     }
 
 def create_pie_chart(df, values_col: str, names_col: str, title: str, **kwargs) -> go.Figure:
-    """Cria gráfico de pizza moderno com bordas arredondadas"""
+    """Cria gráfico de pizza moderno com paleta harmonizada"""
     fig = px.pie(
         df, 
         values=values_col, 
         names=names_col, 
         title=title,
-        color_discrete_sequence=px.colors.qualitative.Set3
+        color_discrete_sequence=settings.CHART_COLORS
     )
     
     # Aplicar tema
@@ -56,16 +83,24 @@ def create_pie_chart(df, values_col: str, names_col: str, title: str, **kwargs) 
     fig.update_traces(
         textposition='inside', 
         textinfo='percent+label',
+        textfont=dict(
+            size=11,
+            color=settings.THEME_COLORS["text_primary"]
+        ),
         hovertemplate='<b>%{label}</b><br>Quantidade: %{value}<br>Percentual: %{percent}<extra></extra>',
         marker=dict(
-            line=dict(color='#000000', width=2)
-        )
+            line=dict(
+                color=settings.THEME_COLORS["background"], 
+                width=3
+            )
+        ),
+        pull=[0.05] * len(df)  # Separação sutil entre fatias
     )
     
     return fig
 
 def create_bar_chart(df, x_col: str, y_col: str, title: str, color_col: Optional[str] = None, **kwargs) -> go.Figure:
-    """Cria gráfico de barras moderno com bordas arredondadas"""
+    """Cria gráfico de barras moderno com paleta harmonizada"""
     if color_col:
         fig = px.bar(
             df, 
@@ -73,7 +108,7 @@ def create_bar_chart(df, x_col: str, y_col: str, title: str, color_col: Optional
             y=y_col, 
             title=title,
             color=color_col,
-            color_continuous_scale='viridis'
+            color_discrete_sequence=settings.CHART_COLORS
         )
     else:
         fig = px.bar(
@@ -81,26 +116,37 @@ def create_bar_chart(df, x_col: str, y_col: str, title: str, color_col: Optional
             x=x_col, 
             y=y_col, 
             title=title,
-            color=y_col,
-            color_continuous_scale='viridis'
+            color_discrete_sequence=settings.CHART_COLORS
         )
     
     # Aplicar tema
     fig.update_layout(**get_plotly_theme()['layout'])
     
-    # Bordas arredondadas (recurso moderno do Plotly 5.19+)
+    # Melhorias visuais modernas
     fig.update_traces(
         marker=dict(
             cornerradius=8,  # Bordas arredondadas
-            line=dict(color='#000000', width=1)
+            line=dict(
+                color=settings.THEME_COLORS["background"], 
+                width=2
+            ),
+            opacity=0.9
         ),
-        hovertemplate='<b>%{x}</b><br>Quantidade: %{y}<extra></extra>'
+        hovertemplate='<b>%{x}</b><br>Quantidade: %{y}<extra></extra>',
+        texttemplate='%{y}',
+        textposition='outside',
+        textfont=dict(
+            color=settings.THEME_COLORS["text_secondary"],
+            size=10
+        )
     )
     
     # Melhorar layout
     fig.update_layout(
         xaxis_tickangle=-45 if len(df) > 5 else 0,
-        showlegend=False
+        showlegend=False,
+        bargap=0.3,  # Espaçamento entre barras
+        bargroupgap=0.1
     )
     
     return fig

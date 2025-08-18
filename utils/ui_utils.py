@@ -232,14 +232,27 @@ def normalizar_status_equipamento(status: str) -> str:
         return "Disponível"
 
 def render_status_badge(status: str) -> None:
-    """Renderiza badge de status com cores semânticas (bolinhas coloridas)"""
+    """Renderiza badge de status com cores semânticas melhoradas"""
     status_normalizado = normalizar_status_equipamento(status)
     
+    # Usar cores semânticas específicas para status
     if status_normalizado == "Disponível":
-        st.success(f"🟢 {status_normalizado}")  # Bolinha verde
+        st.markdown(
+            f'<span style="color: {settings.THEME_COLORS["status_available"]}; font-weight: 600;">🟢 {status_normalizado}</span>', 
+            unsafe_allow_html=True
+        )
     elif status_normalizado == "Indisponível":
-        st.error(f"🔴 {status_normalizado}")    # Bolinha vermelha
+        st.markdown(
+            f'<span style="color: {settings.THEME_COLORS["status_unavailable"]}; font-weight: 600;">🔴 {status_normalizado}</span>', 
+            unsafe_allow_html=True
+        )
     elif status_normalizado == "Manutenção":
-        st.warning(f"🟡 {status_normalizado}")  # Bolinha amarela
+        st.markdown(
+            f'<span style="color: {settings.THEME_COLORS["status_maintenance"]}; font-weight: 600;">🟡 {status_normalizado}</span>', 
+            unsafe_allow_html=True
+        )
     else:
-        st.info(f"⚪ {status_normalizado}")      # Bolinha branca (fallback) 
+        st.markdown(
+            f'<span style="color: {settings.THEME_COLORS["text_muted"]}; font-weight: 600;">⚪ {status_normalizado}</span>', 
+            unsafe_allow_html=True
+        ) 
