@@ -11,6 +11,8 @@ from models.schemas import Equipamento, Movimentacao, EquipamentoResponse, Movim
 from services.excel_service import ExcelService
 from services.movimentacao_service import MovimentacaoService
 from config.settings import settings
+from utils.security_utils import SecurityValidator
+from utils.cache_manager import cache_equipment_data
 
 class EstoqueService:
     """Serviço principal para gerenciar estoque"""
@@ -19,6 +21,7 @@ class EstoqueService:
         self.excel_service = ExcelService()
         self.df_estoque, self.df_movimentacoes = self.excel_service.carregar_dados()
         self.movimentacao_service = MovimentacaoService(self.df_movimentacoes)
+        self.security_validator = SecurityValidator()
     
     def recarregar_dados(self) -> None:
         """Recarrega dados do Excel"""
@@ -57,21 +60,28 @@ class EstoqueService:
         return f"{prefixo}-{marca.upper()}-{numero:03d}"
     
     def adicionar_equipamento(self, equipamento: Equipamento) -> EquipamentoResponse:
-        """Adiciona novo equipamento ao estoque"""
+        """Adiciona novo equipamento ao estoque com validações de segurança"""
         try:
+            # ✅ SANITIZAR E VALIDAR DADOS DE ENTRADA
+            equipamento_data = self.security_validator.validate_equipment_data(equipamento.dict())
+            
+            # Recriar objeto Equipamento com dados sanitizados
+            equipamento_sanitized = Equipamento(**equipamento_data)
+            
             # Verificar se código já existe
-            if self.codigo_existe(equipamento.codigo_produto):
+            if self.codigo_existe(equipamento_sanitized.codigo_produto):
+                logger.warning(f"🚨 Tentativa de adicionar código duplicado: {equipamento_sanitized.codigo_produto}")
                 return EquipamentoResponse(
                     success=False,
-                    message=f"Código '{equipamento.codigo_produto}' já existe"
+                    message=f"Código '{equipamento_sanitized.codigo_produto}' já existe"
                 )
             
             # Gerar novo ID (converter para int Python nativo)
             novo_id = int(self.df_estoque['id'].max() + 1) if not self.df_estoque.empty else 1
-            equipamento.id = novo_id
+            equipamento_sanitized.id = novo_id
             
-            # Adicionar ao DataFrame
-            novo_equipamento = equipamento.dict()
+            # Adicionar ao DataFrame com dados sanitizados
+            novo_equipamento = equipamento_sanitized.dict()
             self.df_estoque = pd.concat([
                 self.df_estoque, 
                 pd.DataFrame([novo_equipamento])
@@ -81,10 +91,10 @@ class EstoqueService:
             movimentacao = Movimentacao(
                 equipamento_id=novo_id,
                 tipo_movimentacao=TipoMovimentacao.ENTRADA,
-                quantidade=equipamento.quantidade,
-                destino_origem=f"Fornecedor: {equipamento.fornecedor}",
-                observacoes=f"Adição inicial ao estoque | Código: {equipamento.codigo_produto}",
-                codigo_produto=equipamento.codigo_produto
+                quantidade=equipamento_sanitized.quantidade,
+                destino_origem=f"Fornecedor: {equipamento_sanitized.fornecedor}",
+                observacoes=f"Adição inicial ao estoque | Código: {equipamento_sanitized.codigo_produto}",
+                codigo_produto=equipamento_sanitized.codigo_produto
             )
             
             self.movimentacao_service.registrar_movimentacao(movimentacao)
@@ -92,11 +102,11 @@ class EstoqueService:
             
             # Salvar dados
             if self.excel_service.salvar_dados(self.df_estoque, self.df_movimentacoes):
-                logger.info(f"Equipamento adicionado: {equipamento.codigo_produto}")
+                logger.info(f"✅ Equipamento adicionado com segurança: {equipamento_sanitized.codigo_produto}")
                 return EquipamentoResponse(
                     success=True,
-                    message=f"Equipamento '{equipamento.equipamento}' adicionado com sucesso!",
-                    equipamento=equipamento
+                    message=f"Equipamento '{equipamento_sanitized.equipamento}' adicionado com sucesso!",
+                    equipamento=equipamento_sanitized.dict()
                 )
             else:
                 return EquipamentoResponse(

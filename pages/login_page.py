@@ -89,8 +89,8 @@ class LoginPage:
             # Formulário de login
             self._render_login_form()
             
-            # Credenciais de demonstração
-            self._render_demo_credentials()
+            # Informações de segurança
+            self._render_security_info()
         
         st.markdown('</div>', unsafe_allow_html=True)
     
@@ -133,9 +133,13 @@ class LoginPage:
         
         # Informações do usuário
         with st.expander("ℹ️ Informações da Sessão"):
-            stats = auth_service.get_user_stats()
-            for key, value in stats.items():
-                st.text(f"{key}: {value}")
+            st.markdown(f"""
+            **👤 Usuário:** {user.username}
+            **🎯 Perfil:** {user.profile.title()}
+            **📋 Permissões:** {len(user.permissions)} recursos
+            **🕐 Login:** {st.session_state.get('login_time', 'N/A')}
+            **🔒 Tentativas:** {auth_service.get_login_attempts(user.username)}
+            """)
     
     def _render_login_form(self) -> None:
         """Renderiza formulário de login"""
@@ -148,14 +152,14 @@ class LoginPage:
             username = st.text_input(
                 "👤 Usuário:",
                 placeholder="Digite seu usuário",
-                help="Use 'admin' ou 'visualizador'"
+                help="Entre em contato com o administrador para obter credenciais"
             )
             
             password = st.text_input(
                 "🔐 Senha:",
                 type="password",
                 placeholder="Digite sua senha",
-                help="Senhas estão na seção abaixo"
+                help="Use a senha fornecida pelo administrador"
             )
             
             # Checkbox "Lembrar-me" (decorativo por enquanto)
@@ -176,31 +180,50 @@ class LoginPage:
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    def _render_demo_credentials(self) -> None:
-        """Renderiza credenciais de demonstração"""
+    def _render_security_info(self) -> None:
+        """Renderiza informações de segurança"""
         st.markdown('<div class="demo-credentials">', unsafe_allow_html=True)
         
-        st.markdown("### 🔑 **Credenciais de Demonstração**")
+        st.markdown("### 🔒 **Sistema de Segurança Ativo**")
         
         col1, col2 = st.columns(2)
         
         with col1:
             st.markdown("""
-            **👑 ADMINISTRADOR**
-            - **Usuário:** `admin`
-            - **Senha:** `admin123`
-            - **Pode:** Ver tudo + Editar
+            **🛡️ PROTEÇÕES ATIVAS**
+            - 🔐 **Senhas criptografadas** (bcrypt)
+            - 🚦 **Rate limiting** (5 tentativas/15min)
+            - 🧹 **Sanitização** de inputs
+            - 📊 **Logs de auditoria** completos
             """)
         
         with col2:
             st.markdown("""
-            **👀 VISUALIZADOR**  
-            - **Usuário:** `visualizador`
-            - **Senha:** `view123`
-            - **Pode:** Ver tudo (somente leitura)
+            **👥 PERFIS DISPONÍVEIS**  
+            - 👑 **Administrador** - Acesso completo
+            - 👀 **Visualizador** - Somente leitura
+            - 🔒 **Credenciais** fornecidas pelo admin
+            - 📋 **Permissões** granulares por perfil
             """)
         
-        st.info("💡 **Dica:** Use estas credenciais para testar o sistema!")
+        st.warning("⚠️ **Atenção:** Credenciais são fornecidas pelo administrador do sistema. Entre em contato se não possui acesso.")
+        
+        # Informações de contato (opcional)
+        with st.expander("📞 Solicitar Acesso"):
+            st.markdown("""
+            **Para obter credenciais de acesso:**
+            
+            1. 📧 **Email:** ti@suaempresa.com
+            2. 📱 **Telefone:** (11) 9999-9999
+            3. 💬 **Teams/Slack:** #suporte-ti
+            4. 🎫 **Ticket:** Sistema de chamados interno
+            
+            **Informações necessárias:**
+            - Nome completo
+            - Cargo/Função
+            - Tipo de acesso necessário (Admin/Visualizador)
+            - Justificativa de uso
+            """)
         
         st.markdown('</div>', unsafe_allow_html=True)
     
@@ -243,7 +266,7 @@ class LoginPage:
             show_error_message(
                 "❌ **Credenciais inválidas!**\n\n"
                 "Verifique se o usuário e senha estão corretos.\n"
-                "Use as credenciais de demonstração mostradas abaixo."
+                "Entre em contato com o administrador se não possui acesso."
             )
             
             show_toast("❌ Login falhou!", "🚫")

@@ -27,9 +27,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Importar novo sistema de CSS
+from utils.modern_css import get_modern_css
+
 # CSS customizado moderno
 def load_modern_css():
     """Carrega CSS moderno otimizado"""
+    return get_modern_css()
+
+def load_legacy_css():
+    """CSS legado (mantido para compatibilidade)"""
     css = """
     <style>
     /* ===== VARIÁVEIS CSS ATUALIZADAS E MELHORADAS ===== */
@@ -530,7 +537,6 @@ def render_header():
             """
             <div style="text-align: center; color: #e0e0e0; margin-bottom: 2rem;">
                 <p><strong>Sistema Moderno de Gerenciamento de Estoque</strong></p>
-                <p>Tecnologia: Streamlit 1.42+ | Plotly 5.21+ | Pandas 2.2+ | Auth 🔐</p>
             </div>
             """, 
             unsafe_allow_html=True
@@ -571,8 +577,8 @@ def render_user_info_sidebar():
 def main():
     """Função principal da aplicação"""
     try:
-        # Carregar CSS moderno
-        load_modern_css()
+        # Carregar CSS moderno profissional
+        st.markdown(load_modern_css(), unsafe_allow_html=True)
         
         # ✅ VERIFICAR AUTENTICAÇÃO PRIMEIRO
         if not auth_service.is_authenticated():

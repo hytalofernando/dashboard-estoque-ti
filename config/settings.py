@@ -40,57 +40,95 @@ class Settings(BaseSettings):
     MIN_VALOR: float = 0.01
     MAX_OBSERVACOES: int = 500
     
-    # Configurações visuais expandidas
+    # Sistema de cores profissional moderno
     THEME_COLORS: Dict[str, str] = {
-        # Cores principais
-        "primary": "#00d4ff",
-        "primary_hover": "#00bde6",
-        "primary_light": "#33ddff",
+        # === CORES PRIMÁRIAS CORPORATIVAS ===
+        "primary": "#0066FF",           # Azul corporativo principal
+        "primary_hover": "#0052CC",     # Azul hover
+        "primary_light": "#4D94FF",     # Azul claro
+        "primary_dark": "#003D99",      # Azul escuro
         
-        # Cores funcionais
-        "success": "#4ade80",
-        "success_light": "#6ee7b7",
-        "warning": "#fbbf24",
-        "warning_light": "#fcd34d",
-        "error": "#f87171",
-        "error_light": "#fca5a5",
-        "info": "#60a5fa",
-        "info_light": "#93c5fd",
+        # === CORES FUNCIONAIS PROFISSIONAIS ===
+        "success": "#00C851",           # Verde sucesso vibrante
+        "success_hover": "#00A142",     # Verde hover
+        "success_light": "#4DD678",     # Verde claro
         
-        # Cores de status semânticas
-        "status_available": "#10b981",
-        "status_unavailable": "#ef4444", 
-        "status_maintenance": "#f59e0b",
-        "status_pending": "#6366f1",
+        "warning": "#FFB300",           # Laranja profissional
+        "warning_hover": "#E69A00",     # Laranja hover  
+        "warning_light": "#FFCC4D",     # Laranja claro
         
-        # Cores de fundo
-        "background": "#0e1117",
-        "background_secondary": "#262730",
-        "background_tertiary": "#404040",
-        "background_card": "#1a1d23",
+        "error": "#FF3547",             # Vermelho suave
+        "error_hover": "#E6253A",       # Vermelho hover
+        "error_light": "#FF6B7A",       # Vermelho claro
         
-        # Cores de texto
-        "text_primary": "#ffffff",
-        "text_secondary": "#f0f0f0",
-        "text_tertiary": "#c1c7cd",
-        "text_muted": "#8b949e"
+        "info": "#17A2B8",              # Azul informativo
+        "info_hover": "#138496",        # Azul info hover
+        "info_light": "#5DBECD",        # Azul info claro
+        
+        # === CORES DE STATUS SEMÂNTICAS ===
+        "status_available": "#00C851",   # Verde disponível
+        "status_unavailable": "#FF3547", # Vermelho indisponível
+        "status_maintenance": "#FFB300", # Laranja manutenção
+        "status_pending": "#6C5CE7",     # Roxo pendente
+        "status_low_stock": "#FD79A8",   # Rosa estoque baixo
+        
+        # === SISTEMA DE NEUTROS MODERNOS ===
+        "gray_50": "#F8FAFC",           # Cinza muito claro
+        "gray_100": "#F1F5F9",          # Cinza claro
+        "gray_200": "#E2E8F0",          # Cinza médio claro
+        "gray_300": "#CBD5E1",          # Cinza médio
+        "gray_400": "#94A3B8",          # Cinza
+        "gray_500": "#64748B",          # Cinza escuro
+        "gray_600": "#475569",          # Cinza muito escuro
+        "gray_700": "#334155",          # Cinza quase preto
+        "gray_800": "#1E293B",          # Cinza preto
+        "gray_900": "#0F172A",          # Preto azulado
+        
+        # === CORES DE FUNDO DARK THEME ===
+        "background": "#0F172A",         # Fundo principal (gray-900)
+        "background_secondary": "#1E293B", # Fundo secundário (gray-800)
+        "background_tertiary": "#334155",  # Fundo terciário (gray-700)
+        "background_card": "#1E293B",      # Fundo de cards
+        "background_sidebar": "#0F172A",   # Fundo da sidebar
+        
+        # === CORES DE TEXTO OTIMIZADAS ===
+        "text_primary": "#F8FAFC",       # Texto principal (gray-50)
+        "text_secondary": "#E2E8F0",     # Texto secundário (gray-200)
+        "text_tertiary": "#94A3B8",      # Texto terciário (gray-400)
+        "text_muted": "#64748B",         # Texto discreto (gray-500)
+        "text_inverse": "#0F172A",       # Texto em fundos claros
+        
+        # === CORES DE DESTAQUE ===
+        "accent_purple": "#6C5CE7",      # Roxo destaque
+        "accent_pink": "#FD79A8",        # Rosa destaque
+        "accent_cyan": "#00CEC9",        # Ciano destaque
+        "accent_orange": "#FF7675",      # Laranja destaque
+        
+        # === CORES DE GRÁFICOS ===
+        "chart_primary": "#0066FF",      # Azul principal
+        "chart_secondary": "#00C851",    # Verde
+        "chart_tertiary": "#FFB300",     # Laranja
+        "chart_quaternary": "#6C5CE7",   # Roxo
+        "chart_quinary": "#FF3547",      # Vermelho
     }
     
-    # Paleta de cores para gráficos (harmonizada com o tema)
+    # Paleta de cores para gráficos profissional
     CHART_COLORS: List[str] = [
-        "#00d4ff",  # Azul ciano principal
-        "#4ade80",  # Verde sucesso
-        "#fbbf24",  # Amarelo aviso
-        "#f87171",  # Vermelho erro
-        "#60a5fa",  # Azul informativo
-        "#a78bfa",  # Roxo
-        "#fb7185",  # Rosa
-        "#34d399",  # Verde claro
-        "#fcd34d",  # Amarelo claro
-        "#f472b6"   # Rosa claro
+        "#0066FF",  # Azul corporativo principal
+        "#00C851",  # Verde sucesso
+        "#FFB300",  # Laranja profissional
+        "#6C5CE7",  # Roxo moderno
+        "#FF3547",  # Vermelho suave
+        "#17A2B8",  # Azul informativo
+        "#FD79A8",  # Rosa destaque
+        "#00CEC9",  # Ciano destaque
+        "#FF7675",  # Laranja destaque
+        "#74B9FF",  # Azul claro
+        "#A29BFE",  # Roxo claro
+        "#6C5CE7"   # Roxo principal
     ]
     
-    # Configurações de páginas ativas - MODO DASHBOARD ÚNICO
+    # Configurações de páginas ativas - SISTEMA COMPLETO
     PAGINAS_ATIVAS: Dict[str, Dict[str, Any]] = {
         "dashboard": {
             "titulo": "📈 Dashboard",
@@ -99,27 +137,27 @@ class Settings(BaseSettings):
         },
         "adicionar": {
             "titulo": "➕ Adicionar Equipamento", 
-            "ativa": False,  # ❌ OCULTO
+            "ativa": True,  # ✅ ATIVO
             "descricao": "Adicionar novos equipamentos ao estoque"
         },
         "remover": {
             "titulo": "➖ Remover Equipamento",
-            "ativa": False,  # ❌ OCULTO
+            "ativa": True,  # ✅ ATIVO
             "descricao": "Remover equipamentos do estoque"
         },
         "historico": {
             "titulo": "📋 Histórico",
-            "ativa": False,  # ❌ OCULTO
+            "ativa": True,  # ✅ ATIVO
             "descricao": "Histórico de movimentações"
         },
         "codigos": {
             "titulo": "🏷️ Códigos",
-            "ativa": False,  # ❌ OCULTO
+            "ativa": True,  # ✅ ATIVO
             "descricao": "Gestão de códigos de produtos"
         },
         "configuracoes": {
             "titulo": "⚙️ Configurações",
-            "ativa": False,  # ❌ OCULTO
+            "ativa": True,  # ✅ ATIVO
             "descricao": "Configurações da aplicação e páginas"
         }
     }

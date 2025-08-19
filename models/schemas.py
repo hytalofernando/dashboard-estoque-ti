@@ -73,7 +73,7 @@ class EquipamentoResponse(BaseModel):
     """Resposta de operação em equipamento"""
     success: bool
     message: str
-    equipamento: Optional[Equipamento] = None
+    equipamento: Optional[dict] = None
     nova_quantidade: Optional[int] = None
 
 class MovimentacaoResponse(BaseModel):

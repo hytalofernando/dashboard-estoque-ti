@@ -403,6 +403,12 @@ class RemoverEquipamentoPageProfessional:
                 "codigo_produto": str(equipamento.get('codigo_produto', 'N/A'))
             })
         
+        # ✅ REMOVIDO TEMPORARIAMENTE OS BOTÕES DE QUANTIDADE RÁPIDA PARA DEBUGGING
+        quantidade_key = f"qtd_remover_{equipamento['id']}_{int(equipamento['quantidade'])}"
+        
+        # Mostrar dica sobre quantidade máxima disponível
+        st.info(f"💡 **Quantidade disponível:** {equipamento['quantidade']} unidades | Você pode alterar a quantidade no campo abaixo.")
+        
         # Formulário de remoção COM KEYS ÚNICAS
         form_key = f"remover_{equipamento['id']}_{int(equipamento['quantidade'])}"  # ✅ Key única incluindo quantidade
         with st.form(form_key, clear_on_submit=True):
@@ -410,12 +416,11 @@ class RemoverEquipamentoPageProfessional:
             
             with col_form1:
                 # ✅ FIELD ÚNICO com key específica
-                quantidade_key = f"qtd_remover_{equipamento['id']}_{int(equipamento['quantidade'])}"
                 quantidade = st.number_input(
                     "📊 Quantidade a Remover",
                     min_value=1,
                     max_value=int(equipamento['quantidade']),
-                    value=1,
+                    value=st.session_state.get(quantidade_key, 1),  # ✅ Usar valor do session_state se disponível
                     step=1,  # ✅ Garantir incremento de 1
                     help=f"💡 DICA: Você pode remover de 1 até {equipamento['quantidade']} unidades de uma vez!",
                     key=quantidade_key  # ✅ Key única
@@ -428,31 +433,6 @@ class RemoverEquipamentoPageProfessional:
                     st.success(f"✅ Removendo **{quantidade} unidades** de {equipamento['quantidade']} disponíveis")
                 
                 st.caption(f"🔍 **Debug:** Valor capturado = {quantidade} | Tipo = {type(quantidade)}")
-                
-                # ✅ BOTÕES DE QUANTIDADE RÁPIDA
-                if equipamento['quantidade'] > 1:
-                    st.markdown("**⚡ Quantidade Rápida:**")
-                    col_btn1, col_btn2, col_btn3, col_btn4 = st.columns(4)
-                    
-                    with col_btn1:
-                        if st.button("🔢 Metade", key=f"half_{equipamento['id']}", help="Remover metade do estoque"):
-                            st.session_state[quantidade_key] = int(equipamento['quantidade'] // 2)
-                            st.rerun()
-                    
-                    with col_btn2:
-                        if equipamento['quantidade'] >= 5 and st.button("5️⃣ 5 un", key=f"five_{equipamento['id']}", help="Remover 5 unidades"):
-                            st.session_state[quantidade_key] = 5
-                            st.rerun()
-                    
-                    with col_btn3:
-                        if equipamento['quantidade'] >= 10 and st.button("🔟 10 un", key=f"ten_{equipamento['id']}", help="Remover 10 unidades"):
-                            st.session_state[quantidade_key] = 10
-                            st.rerun()
-                    
-                    with col_btn4:
-                        if st.button("💯 Tudo", key=f"all_{equipamento['id']}", help="Remover tudo"):
-                            st.session_state[quantidade_key] = int(equipamento['quantidade'])
-                            st.rerun()
                 
                 destino = st.text_input(
                     "📍 Destino",
