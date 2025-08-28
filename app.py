@@ -710,7 +710,7 @@ def main():
         st.markdown(
             """
             <div style="text-align: center; color: #666; margin-top: 2rem;">
-                <p><strong>Dashboard Estoque TI v2.0</strong> | Desenvolvido com ❤️ e tecnologias modernas</p>
+                <p><strong>Dashboard Estoque TI v2.0</strong> | Desenvolvedor: Hytalo Fernando</p>
             </div>
             """, 
             unsafe_allow_html=True

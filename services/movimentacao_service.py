@@ -16,20 +16,40 @@ class MovimentacaoService:
         self.df_movimentacoes = df_movimentacoes if df_movimentacoes is not None else pd.DataFrame()
     
     def registrar_movimentacao(self, movimentacao: Movimentacao) -> MovimentacaoResponse:
-        """Registra nova movimentação"""
+        """Registra nova movimentação com validação aprimorada"""
         try:
+            # Validar tipo de movimentação
+            if not movimentacao.tipo_movimentacao:
+                logger.error("Tipo de movimentação não especificado")
+                return MovimentacaoResponse(
+                    success=False,
+                    message="Tipo de movimentação é obrigatório"
+                )
+            
             # Gerar novo ID (converter para int Python nativo)
             novo_id = int(self.df_movimentacoes['id'].max() + 1) if not self.df_movimentacoes.empty else 1
             movimentacao.id = novo_id
             
-            # Adicionar ao DataFrame
+            # Converter para dict e validar campos
             nova_movimentacao = movimentacao.dict()
+            
+            # Garantir que campos obrigatórios existem
+            campos_obrigatorios = ['id', 'equipamento_id', 'tipo_movimentacao', 'quantidade', 'destino_origem']
+            for campo in campos_obrigatorios:
+                if campo not in nova_movimentacao or nova_movimentacao[campo] is None:
+                    logger.error(f"Campo obrigatório '{campo}' ausente ou nulo")
+                    return MovimentacaoResponse(
+                        success=False,
+                        message=f"Campo '{campo}' é obrigatório"
+                    )
+            
+            # Adicionar ao DataFrame
             self.df_movimentacoes = pd.concat([
                 self.df_movimentacoes, 
                 pd.DataFrame([nova_movimentacao])
             ], ignore_index=True)
             
-            logger.info(f"Movimentação registrada: {movimentacao.tipo_movimentacao} - {movimentacao.quantidade}")
+            logger.info(f"✅ Movimentação registrada com sucesso: {movimentacao.tipo_movimentacao.value} - {movimentacao.quantidade} unidades - Código: {movimentacao.codigo_produto}")
             return MovimentacaoResponse(
                 success=True,
                 message="Movimentação registrada com sucesso",
@@ -37,7 +57,7 @@ class MovimentacaoService:
             )
             
         except Exception as e:
-            logger.error(f"Erro ao registrar movimentação: {str(e)}")
+            logger.error(f"Erro crítico ao registrar movimentação: {str(e)}")
             return MovimentacaoResponse(
                 success=False,
                 message=f"Erro interno: {str(e)}"

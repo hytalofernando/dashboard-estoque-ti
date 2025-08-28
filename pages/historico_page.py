@@ -50,30 +50,47 @@ class HistoricoMovimentacoesPageProfessional:
         # Tabs organizadas
         self._render_tabs_organizadas(df_filtrado, df_movimentacoes)
     
-    @st.cache_data(ttl=30, show_spinner=False)  # Cache por 30 segundos
+    @st.cache_data(ttl=15, show_spinner=False)  # Cache reduzido para 15 segundos para mais responsividade
     def _get_movimentacoes_cache(_self) -> pd.DataFrame:
-        """Cache inteligente de movimentações com invalidação automática"""
+        """Cache inteligente de movimentações com validação aprimorada"""
         try:
             # Recarregar dados do Excel sempre
             _self.estoque_service.recarregar_dados()
             df_movimentacoes = _self.estoque_service.movimentacao_service.obter_movimentacoes()
             
             if not df_movimentacoes.empty:
-                # Corrigir campos ausentes
-                if 'codigo_produto' not in df_movimentacoes.columns:
-                    df_movimentacoes['codigo_produto'] = 'N/A'
+                # Validação e correção de dados mais robusta
+                colunas_necessarias = ['codigo_produto', 'observacoes', 'tipo_movimentacao', 'quantidade']
+                for coluna in colunas_necessarias:
+                    if coluna not in df_movimentacoes.columns:
+                        if coluna == 'codigo_produto':
+                            df_movimentacoes[coluna] = 'N/A'
+                        elif coluna == 'observacoes':
+                            df_movimentacoes[coluna] = ''
+                        else:
+                            logger.warning(f"Coluna obrigatória '{coluna}' não encontrada")
                 
-                # Preencher NaN com valores padrão
+                # Preencher valores NaN/None de forma mais cuidadosa
                 df_movimentacoes['codigo_produto'] = df_movimentacoes['codigo_produto'].fillna('N/A')
                 df_movimentacoes['observacoes'] = df_movimentacoes['observacoes'].fillna('')
                 
-                # Converter datas
-                df_movimentacoes['data_movimentacao'] = pd.to_datetime(df_movimentacoes['data_movimentacao'])
+                # Validar e corrigir tipos de movimentação
+                df_movimentacoes['tipo_movimentacao'] = df_movimentacoes['tipo_movimentacao'].fillna('Entrada')
+                
+                # Converter datas com tratamento de erro
+                try:
+                    df_movimentacoes['data_movimentacao'] = pd.to_datetime(df_movimentacoes['data_movimentacao'])
+                except Exception as e:
+                    logger.error(f"Erro ao converter datas: {str(e)}")
+                    # Usar data atual como fallback
+                    df_movimentacoes['data_movimentacao'] = pd.to_datetime('today')
                 
                 # Ordenar por data (mais recente primeiro)
                 df_movimentacoes = df_movimentacoes.sort_values('data_movimentacao', ascending=False)
                 
-                logger.info(f"📊 Cache de histórico atualizado: {len(df_movimentacoes)} movimentações")
+                logger.info(f"📊 Cache de histórico atualizado: {len(df_movimentacoes)} movimentações validadas")
+            else:
+                logger.info("📊 Nenhuma movimentação encontrada")
             
             # Marcar cache como válido
             st.session_state['historico_cache_invalidated'] = False
@@ -81,7 +98,7 @@ class HistoricoMovimentacoesPageProfessional:
             return df_movimentacoes
             
         except Exception as e:
-            logger.error(f"Erro ao carregar cache de movimentações: {str(e)}")
+            logger.error(f"Erro crítico ao carregar cache de movimentações: {str(e)}")
             return pd.DataFrame()
     
     def _invalidate_cache(self) -> None:
@@ -123,6 +140,15 @@ class HistoricoMovimentacoesPageProfessional:
         with col4:
             if st.button("🧹 Limpar Filtros", use_container_width=True):
                 self._clear_filters()
+        
+        # Informações de debug (somente se houver dados)
+        df_debug = self._get_movimentacoes_cache()
+        if not df_debug.empty:
+            st.caption(f"🔍 **Debug:** {len(df_debug)} movimentações carregadas | Última atualização: {datetime.now().strftime('%H:%M:%S')}")
+            
+            # Mostrar tipos únicos encontrados para debug
+            tipos_unicos = df_debug['tipo_movimentacao'].unique().tolist()
+            st.caption(f"📊 **Tipos encontrados:** {', '.join(tipos_unicos)}")
     
     def _force_reload(self) -> None:
         """Força recarregamento dos dados"""
@@ -237,16 +263,27 @@ class HistoricoMovimentacoesPageProfessional:
             key="hist_busca_codigo"
         )
         
-        # Estatísticas na sidebar
+        # Estatísticas na sidebar - melhoradas e mais precisas
         st.sidebar.markdown("---")
         st.sidebar.markdown("### 📊 **Estatísticas Rápidas**")
-        total = len(df)
-        entradas = len(df[df['tipo_movimentacao'].str.contains('Entrada', case=False, na=False)])
-        saidas = len(df[df['tipo_movimentacao'].str.contains('Saída|Saida', case=False, na=False)])
+        
+        # Normalizar todos os tipos antes de contar
+        df_stats = df.copy()
+        df_stats['tipo_normalizado'] = df_stats['tipo_movimentacao'].apply(
+            lambda x: self._normalizar_tipo_movimentacao(x)
+        )
+        
+        total = len(df_stats)
+        entradas = len(df_stats[df_stats['tipo_normalizado'] == 'Entrada'])
+        saidas = len(df_stats[df_stats['tipo_normalizado'] == 'Saída'])
+        
+        # Calcular quantidades também
+        qtd_entradas = df_stats[df_stats['tipo_normalizado'] == 'Entrada']['quantidade'].sum() if entradas > 0 else 0
+        qtd_saidas = df_stats[df_stats['tipo_normalizado'] == 'Saída']['quantidade'].sum() if saidas > 0 else 0
         
         st.sidebar.metric("📊 Total", f"{total:,}")
-        st.sidebar.metric("📈 Entradas", f"{entradas:,}")
-        st.sidebar.metric("📉 Saídas", f"{saidas:,}")
+        st.sidebar.metric("📈 Entradas", f"{entradas:,}", delta=f"+{qtd_entradas:,} itens")
+        st.sidebar.metric("📉 Saídas", f"{saidas:,}", delta=f"-{qtd_saidas:,} itens")
         
         return filtros
     
@@ -300,19 +337,21 @@ class HistoricoMovimentacoesPageProfessional:
         return df_filtrado
     
     def _normalizar_tipo_movimentacao(self, tipo: str) -> str:
-        """Normaliza tipos de movimentação para manter consistência visual"""
+        """Normaliza tipos de movimentação com validação rigorosa"""
         if not tipo or pd.isna(tipo):
-            return "Entrada"  # Default
+            logger.warning("Tipo de movimentação vazio encontrado - usando 'Entrada' como padrão")
+            return "Entrada"
         
         tipo_str = str(tipo).strip()
         
-        # Converter enums para strings simples
-        if "ENTRADA" in tipo_str.upper() or "Entrada" in tipo_str:
+        # Conversão mais rigorosa com logging para debug
+        if tipo_str in ["Entrada", "ENTRADA"] or "Entrada" in tipo_str:
             return "Entrada"
-        elif "SAIDA" in tipo_str.upper() or "SAÍDA" in tipo_str.upper() or "Saída" in tipo_str:
+        elif tipo_str in ["Saída", "SAÍDA", "SAIDA"] or "Saída" in tipo_str or "Saida" in tipo_str:
             return "Saída"
         else:
-            # Fallback: assumir que é entrada se não conseguir determinar
+            # Log para tipos não reconhecidos antes do fallback
+            logger.warning(f"Tipo de movimentação não reconhecido: '{tipo_str}' - usando 'Entrada' como fallback")
             return "Entrada"
     
     def _render_tabs_organizadas(self, df_filtrado: pd.DataFrame, df_completo: pd.DataFrame) -> None:
@@ -441,17 +480,38 @@ class HistoricoMovimentacoesPageProfessional:
             return
         
         try:
-            # Enriquecer dados com informações de equipamentos
+            # Enriquecer dados com informações de equipamentos de forma mais robusta
             df_estoque = self.estoque_service.obter_equipamentos()
             
-            # Merge inteligente
-            df_enriquecido = df.merge(
-                df_estoque[['id', 'equipamento', 'categoria', 'marca']],
-                left_on='equipamento_id',
-                right_on='id',
-                how='left',
-                suffixes=('', '_equip')
-            )
+            if not df_estoque.empty and 'equipamento_id' in df.columns:
+                # Verificar se colunas necessárias existem no estoque
+                colunas_merge = ['id', 'equipamento', 'categoria', 'marca']
+                colunas_disponveis = [col for col in colunas_merge if col in df_estoque.columns]
+                
+                if len(colunas_disponveis) >= 2:  # Pelo menos ID e uma outra coluna
+                    # Merge inteligente com validação
+                    df_enriquecido = df.merge(
+                        df_estoque[colunas_disponveis],
+                        left_on='equipamento_id',
+                        right_on='id',
+                        how='left',
+                        suffixes=('', '_equip')
+                    )
+                    logger.info(f"Merge realizado com {len(colunas_disponveis)} colunas do estoque")
+                else:
+                    logger.warning("Colunas insuficientes no estoque para merge - usando dados básicos")
+                    df_enriquecido = df.copy()
+                    # Adicionar colunas vazias para manter compatibilidade
+                    for col in ['equipamento', 'categoria', 'marca']:
+                        if col not in df_enriquecido.columns:
+                            df_enriquecido[col] = 'N/A'
+            else:
+                logger.warning("Estoque vazio ou coluna equipamento_id ausente - usando dados básicos")
+                df_enriquecido = df.copy()
+                # Adicionar colunas vazias para manter compatibilidade
+                for col in ['equipamento', 'categoria', 'marca']:
+                    if col not in df_enriquecido.columns:
+                        df_enriquecido[col] = 'N/A'
             
             # Preparar para exibição
             df_display = df_enriquecido.copy()

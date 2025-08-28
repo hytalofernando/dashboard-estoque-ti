@@ -18,8 +18,13 @@ class TipoMovimentacao(str, Enum):
     ENTRADA = "Entrada"
     SAIDA = "Saída"
 
+class CondicionEquipamento(str, Enum):
+    """Condição do equipamento - Novo ou Usado"""
+    NOVO = "Novo"
+    USADO = "Usado"
+
 class Equipamento(BaseModel):
-    """Modelo para equipamento"""
+    """Modelo para equipamento com condição Novo/Usado"""
     id: Optional[int] = None
     equipamento: str = Field(..., min_length=1, max_length=100)
     categoria: str = Field(..., min_length=1)
@@ -31,6 +36,7 @@ class Equipamento(BaseModel):
     data_chegada: str = Field(default_factory=lambda: datetime.now().strftime('%Y-%m-%d'))
     fornecedor: str = Field(..., min_length=1, max_length=100)
     status: str = "Disponível"
+    condicao: CondicionEquipamento = Field(default=CondicionEquipamento.NOVO, description="Condição do equipamento: Novo ou Usado")
     
     @field_validator('codigo_produto')
     @classmethod
@@ -51,7 +57,7 @@ class Equipamento(BaseModel):
         return v
 
 class Movimentacao(BaseModel):
-    """Modelo para movimentação"""
+    """Modelo para movimentação com rastreamento de condição"""
     id: Optional[int] = None
     equipamento_id: int = Field(..., gt=0)
     tipo_movimentacao: TipoMovimentacao
@@ -60,6 +66,7 @@ class Movimentacao(BaseModel):
     destino_origem: str = Field(..., min_length=1, max_length=100)
     observacoes: Optional[str] = Field(None, max_length=500)
     codigo_produto: Optional[str] = None
+    condicao: CondicionEquipamento = Field(default=CondicionEquipamento.NOVO, description="Condição do equipamento movimentado: Novo ou Usado")
     
     @field_validator('observacoes')
     @classmethod

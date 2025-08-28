@@ -301,6 +301,31 @@ class SecurityValidator:
                 allow_special=True
             )
         
+        # Condição do equipamento (campo novo)
+        if 'condicao' in data:
+            # Valida se é um valor válido do enum
+            from models.schemas import CondicionEquipamento
+            if isinstance(data['condicao'], str):
+                # Se for string, tenta converter para enum
+                if data['condicao'] in [c.value for c in CondicionEquipamento]:
+                    validated['condicao'] = data['condicao']
+                else:
+                    validated['condicao'] = CondicionEquipamento.NOVO.value  # padrão
+            elif hasattr(data['condicao'], 'value'):
+                # Se já for enum, pega o valor
+                validated['condicao'] = data['condicao'].value
+            else:
+                validated['condicao'] = CondicionEquipamento.NOVO.value  # padrão
+        else:
+            # Se não existe, adiciona padrão para compatibilidade
+            validated['condicao'] = CondicionEquipamento.NOVO.value
+        
+        # Campos que devem ser preservados se existirem
+        preserve_fields = ['id', 'data_chegada', 'status']
+        for field in preserve_fields:
+            if field in data:
+                validated[field] = data[field]
+        
         return validated
     
     @staticmethod
