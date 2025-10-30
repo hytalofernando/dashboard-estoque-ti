@@ -44,6 +44,10 @@ backup_*.xlsx
 estoque_ti.xlsx
 dados_backup/
 backups/
+# Mas manter backup_excel/ (não ignorar)
+!backup_excel/
+!backup_excel/*.xlsx
+!backup_excel/*.md
 
 # === LOGS ===
 logs/

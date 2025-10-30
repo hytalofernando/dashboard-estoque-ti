@@ -6,13 +6,17 @@ Dashboard Estoque TI
 import streamlit as st
 import os
 
+# ✅ CARREGAR VARIÁVEIS DE AMBIENTE PRIMEIRO!
+from dotenv import load_dotenv
+load_dotenv()
+
 # Configuração de logging
 from loguru import logger
 logger.add("logs/dashboard.log", rotation="1 week", retention="1 month", level="INFO")
 
 # Imports dos serviços e configurações
 from config.settings import settings
-from services.estoque_service import EstoqueService
+from services import EstoqueService, get_service_info
 from utils.ui_utils import show_toast, show_error_message
 
 # ✅ SISTEMA DE AUTENTICAÇÃO
@@ -158,13 +162,22 @@ def main():
         
         # Informações da sidebar
         with st.sidebar.expander("ℹ️ Informações do Sistema"):
-            st.markdown("""
-            **Versão:** 2.0.0 Moderna + Auth 🔐  
+            # Obter informações do banco de dados
+            service_info = get_service_info()
+            db_status = "🐘 PostgreSQL" if service_info['tipo'] in ['PostgreSQL', 'SQLite'] else "📊 Excel"
+            persistente = "✅ Persistente" if service_info.get('persistente', False) else "⚠️ Temporário"
+            
+            st.markdown(f"""
+            **Versão:** 3.0.0 + PostgreSQL 🐘  
+            **Banco de Dados:** {db_status}  
+            **Status:** {persistente}
+            
             **Tecnologias:**
             - Streamlit 1.42+
             - Plotly 5.21+ 
             - Pandas 2.2+
             - Pydantic 2.5+
+            - SQLAlchemy 2.0+
             - Sistema de Autenticação
             
             **Recursos Modernos:**
@@ -174,6 +187,7 @@ def main():
             - Validação de dados
             - Logs estruturados
             - Sistema de login seguro
+            - {'Dados persistentes 🔒' if service_info.get('persistente') else 'Excel (dados temporários)'}
             """)
             
             # ✅ Estatísticas das páginas baseadas em permissões

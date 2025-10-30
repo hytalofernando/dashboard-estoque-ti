@@ -31,7 +31,6 @@ class EstoqueService:
         # Com PostgreSQL, os dados já são sempre atualizados
         logger.info("🔄 Dados do PostgreSQL sempre atualizados")
     
-    @cache_equipment_data(ttl_seconds=300)  # Cache de 5 minutos
     def obter_equipamentos(self) -> pd.DataFrame:
         """Retorna todos os equipamentos"""
         try:
