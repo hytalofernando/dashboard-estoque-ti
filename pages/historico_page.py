@@ -318,11 +318,11 @@ class HistoricoMovimentacoesPageProfessional:
             if filtros.get('busca_equipamento'):
                 busca = filtros['busca_equipamento'].lower()
                 
-                # Buscar nas observações (que contém info do equipamento) - CORRIGIDO
-                mask_obs = df_filtrado['observacoes'].astype(str).str.lower().str.contains(busca, na=False)
-                mask_destino = df_filtrado['destino_origem'].astype(str).str.lower().str.contains(busca, na=False)
+                # Buscar nas observações e nome
+                mask_obs = df_filtrado.get('Observações', pd.Series(dtype=str)).astype(str).str.lower().str.contains(busca, na=False)
+                mask_nome = df_filtrado.get('Nome', pd.Series(dtype=str)).astype(str).str.lower().str.contains(busca, na=False)
                 
-                df_filtrado = df_filtrado[mask_obs | mask_destino]
+                df_filtrado = df_filtrado[mask_obs | mask_nome]
             
             # Busca por código - CORRIGIDO
             if filtros.get('busca_codigo'):
@@ -516,23 +516,32 @@ class HistoricoMovimentacoesPageProfessional:
             
             # Preparar para exibição
             df_display = df_enriquecido.copy()
-            df_display['Data'] = df_display['data_movimentacao'].dt.strftime('%d/%m/%Y %H:%M')
-            df_display['Tipo'] = df_display['tipo_movimentacao']
-            df_display['Equipamento'] = df_display['equipamento'].fillna('N/A')
-            df_display['Categoria'] = df_display['categoria'].fillna('N/A')
-            df_display['Marca'] = df_display['marca'].fillna('N/A')
-            df_display['Código'] = df_display['codigo_produto']
-            df_display['Qtd'] = df_display['quantidade']
-            df_display['Destino/Origem'] = df_display['destino_origem']
-            df_display['Observações'] = df_display['observacoes']
+            
+            # Mapear colunas do banco para nomes amigáveis
+            if 'Data' in df_display.columns:
+                df_display['Data_Formatada'] = pd.to_datetime(df_display['Data']).dt.strftime('%d/%m/%Y %H:%M')
+            else:
+                df_display['Data_Formatada'] = 'N/A'
+            
+            df_display['Tipo_Display'] = df_display.get('Tipo', 'N/A')
+            df_display['Equipamento'] = df_display.get('Nome', df_display.get('equipamento', 'N/A'))
+            df_display['Categoria'] = df_display.get('Categoria', df_display.get('categoria', 'N/A'))
+            df_display['Marca'] = df_display.get('Marca', df_display.get('marca', 'N/A'))
+            df_display['Código'] = df_display.get('Código', df_display.get('codigo_produto', 'N/A'))
+            df_display['Qtd'] = df_display.get('Quantidade', df_display.get('quantidade', 0))
+            df_display['Destino/Origem'] = df_display.get('Observações', '')
+            df_display['Observações_Full'] = df_display.get('Observações', '')
             
             # Selecionar colunas finais
             colunas_finais = [
-                'Data', 'Tipo', 'Equipamento', 'Categoria', 'Marca',
-                'Código', 'Qtd', 'Destino/Origem', 'Observações'
+                'Data_Formatada', 'Tipo_Display', 'Equipamento', 'Categoria', 'Marca',
+                'Código', 'Qtd', 'Destino/Origem', 'Observações_Full'
             ]
             
-            df_final = df_display[colunas_finais]
+            # Renomear para exibição
+            df_final = df_display[colunas_finais].copy()
+            df_final.columns = ['Data', 'Tipo', 'Equipamento', 'Categoria', 'Marca',
+                               'Código', 'Qtd', 'Destino/Origem', 'Observações']
             
             # Exibir com configuração avançada
             st.dataframe(
@@ -540,7 +549,7 @@ class HistoricoMovimentacoesPageProfessional:
                 use_container_width=True,
                 height=500,
                 column_config={
-                    "Data": st.column_config.DatetimeColumn(
+                    "Data": st.column_config.TextColumn(
                         "Data",
                         help="Data e hora da movimentação"
                     ),
@@ -550,7 +559,12 @@ class HistoricoMovimentacoesPageProfessional:
                     ),
                     "Qtd": st.column_config.NumberColumn(
                         "Qtd",
-                        help="Quantidade movimentada"
+                        help="Quantidade movimentada",
+                        format="%d"
+                    ),
+                    "Destino/Origem": st.column_config.TextColumn(
+                        "Destino/Origem",
+                        help="Destino da saída ou origem da entrada"
                     )
                 }
             )
@@ -631,15 +645,20 @@ class HistoricoMovimentacoesPageProfessional:
                     st.markdown(f"### {icone}")
                 
                 with col2:
-                    data_formatada = pd.to_datetime(mov['data_movimentacao']).strftime('%d/%m/%Y %H:%M')
-                    codigo = mov.get('codigo_produto', 'N/A')
+                    # Mapear colunas corretamente
+                    data_raw = mov.get('Data', mov.get('data_movimentacao', datetime.now()))
+                    data_formatada = pd.to_datetime(data_raw).strftime('%d/%m/%Y %H:%M')
+                    codigo = mov.get('Código', mov.get('codigo_produto', 'N/A'))
+                    nome = mov.get('Nome', mov.get('equipamento', 'N/A'))
+                    qtd = mov.get('Quantidade', mov.get('quantidade', 0))
+                    obs = mov.get('Observações', mov.get('observacoes', ''))
                     
-                    st.markdown(f"**Código: {codigo}**")
-                    st.markdown(f"**{tipo_normalizado}** - {mov['quantidade']} unidades")
-                    st.markdown(f"*{data_formatada} - {mov['destino_origem']}*")
+                    st.markdown(f"**{nome}** - Código: {codigo}")
+                    st.markdown(f"**{tipo_normalizado}** - {qtd} unidades")
+                    st.markdown(f"*{data_formatada}*")
                     
-                    if mov.get('observacoes'):
-                        st.caption(f"📝 {mov['observacoes']}")
+                    if obs:
+                        st.caption(f"📝 {obs}")
                 
                 with col3:
                     # 🎨 CORES CORRETAS baseadas no tipo (semântica original)
