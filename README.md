@@ -15,6 +15,8 @@ Sistema moderno e completo de gerenciamento de estoque de equipamentos de TI com
 - **Pydantic 2.5+** - Validação robusta de dados
 - **Loguru 0.7+** - Sistema de logs estruturado
 - **Bcrypt 4.0+** - Criptografia segura de senhas
+- **PostgreSQL/SQLite** - Banco de dados robusto e persistente
+- **SQLAlchemy 2.0+** - ORM moderno para gerenciamento de dados
 
 ## ✨ **Recursos Principais da v3.0**
 
@@ -51,36 +53,49 @@ Sistema moderno e completo de gerenciamento de estoque de equipamentos de TI com
 - 📈 Operações otimizadas com pandas
 - 🔄 Códigos sempre como string (consistência)
 - ⚡ Carregamento rápido e eficiente
+- 🐘 **PostgreSQL** - Dados persistentes e seguros (sem perda em restarts)
 
 ## 📁 **Estrutura do Projeto**
 
 ```
 dashboard/
-├── app.py                      # Aplicação principal modernizada
-├── requirements.txt            # Dependências atualizadas
+├── app.py                          # Aplicação principal modernizada
+├── requirements.txt                # Dependências atualizadas
+├── migrate_excel_to_postgres.py   # 🆕 Script de migração Excel → PostgreSQL
 ├── config/
 │   ├── __init__.py
-│   └── settings.py            # Configurações centralizadas
+│   ├── settings.py                # Configurações centralizadas
+│   └── database_config.py         # 🆕 Configuração do banco de dados
 ├── models/
 │   ├── __init__.py
-│   └── schemas.py             # Modelos de dados com Pydantic
+│   ├── schemas.py                 # Modelos de dados com Pydantic
+│   └── database_models.py         # 🆕 Modelos SQLAlchemy (PostgreSQL)
 ├── services/
 │   ├── __init__.py
-│   ├── excel_service.py       # Serviço para operações Excel
-│   ├── estoque_service.py     # Lógica principal do estoque
-│   └── movimentacao_service.py # Gerenciamento de movimentações
+│   ├── excel_service.py           # Serviço para operações Excel (legado)
+│   ├── database_service.py        # 🆕 Serviço PostgreSQL/SQLite
+│   ├── estoque_service.py         # Lógica principal (Excel)
+│   ├── estoque_service_postgres.py # 🆕 Lógica principal (PostgreSQL)
+│   └── movimentacao_service.py    # Gerenciamento de movimentações
 ├── utils/
 │   ├── __init__.py
-│   ├── plotly_utils.py        # Utilitários para gráficos modernos
-│   └── ui_utils.py            # Utilitários para interface
+│   ├── plotly_utils.py            # Utilitários para gráficos modernos
+│   ├── ui_utils.py                # Utilitários para interface
+│   ├── security_utils.py          # Utilitários de segurança
+│   └── cache_manager.py           # Gerenciamento de cache
 ├── pages/
 │   ├── __init__.py
-│   ├── dashboard_page.py      # Página principal
-│   ├── adicionar_page.py      # Adicionar equipamentos
-│   ├── remover_page.py        # Remover equipamentos
-│   ├── historico_page.py      # Histórico de movimentações
-│   └── codigos_page.py        # Gerenciamento de códigos
-└── logs/                      # Logs estruturados (criado automaticamente)
+│   ├── dashboard_page.py          # Página principal
+│   ├── adicionar_page.py          # Adicionar equipamentos
+│   ├── remover_page.py            # Remover equipamentos
+│   ├── historico_page.py          # Histórico de movimentações
+│   ├── codigos_page.py            # Gerenciamento de códigos
+│   ├── configuracoes_page.py      # Configurações do sistema
+│   └── login_page.py              # Página de login
+├── auth/
+│   ├── __init__.py
+│   └── auth_service.py            # Serviço de autenticação
+└── logs/                          # Logs estruturados (criado automaticamente)
 ```
 
 ## 🛠️ **Instalação e Execução**
@@ -238,6 +253,53 @@ Validação robusta com Pydantic + Sanitização:
 - 📦 Projeto 2.4% mais leve
 - ✅ 0 imports desnecessários
 - 🎯 100% código útil
+
+---
+
+## 🐘 **PostgreSQL - Dados Persistentes**
+
+### **Por que PostgreSQL?**
+
+✅ **Dados nunca são perdidos** - Mesmo com restarts do servidor  
+✅ **Performance superior** - Otimizado para grandes volumes  
+✅ **Transações seguras** - ACID compliant  
+✅ **Backup automático** - No Streamlit Cloud  
+✅ **Escalável** - Suporta crescimento do sistema  
+
+### **Como Migrar para PostgreSQL?**
+
+#### **Opção 1: Migração Rápida (10 minutos)**
+
+```bash
+# 1. Instalar dependências
+pip install -r requirements.txt
+
+# 2. Configurar banco (SQLite para desenvolvimento)
+# Não precisa fazer nada! Já funciona automaticamente
+
+# 3. Migrar dados
+python migrate_excel_to_postgres.py
+
+# 4. Pronto!
+streamlit run app.py
+```
+
+#### **Opção 2: PostgreSQL Completo (Produção)**
+
+Veja o guia completo: **[POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md)**
+
+**Guia rápido:** **[MIGRACAO_RAPIDA.md](MIGRACAO_RAPIDA.md)**
+
+### **No Streamlit Cloud:**
+
+1. **Settings** → **Data sources** → **Connect to PostgreSQL**
+2. Copie a `DATABASE_URL` fornecida
+3. **Settings** → **Secrets** → Cole `DATABASE_URL = "postgresql://..."`
+4. Faça deploy normalmente!
+
+**✨ O sistema detecta automaticamente e usa PostgreSQL!**
+
+---
 
 ## 🐛 **Solução de Problemas**
 
