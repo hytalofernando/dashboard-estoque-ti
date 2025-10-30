@@ -244,28 +244,261 @@ def get_modern_css() -> str:
     
     /* ===== COMPONENTES STREAMLIT ===== */
     
-    /* Sidebar */
+    /* Sidebar com fundo preto e melhor contraste */
     .css-1d391kg {{
-        background: var(--bg-sidebar) !important;
+        background: #000000 !important;
         border-right: 1px solid var(--gray-700);
     }}
     
-    /* Métricas */
+    /* Seletores adicionais para garantir sidebar preto */
+    .stSidebar {{
+        background: #000000 !important;
+    }}
+    
+    .stSidebar > div {{
+        background: #000000 !important;
+    }}
+    
+    [data-testid="stSidebar"] {{
+        background: #000000 !important;
+    }}
+    
+    [data-testid="stSidebar"] > div {{
+        background: #000000 !important;
+    }}
+    
+    /* Container principal do sidebar */
+    .css-1d391kg, .css-17lntkn, .css-1y0tads {{
+        background: #000000 !important;
+    }}
+    
+    /* Textos do sidebar com contraste otimizado para fundo preto */
+    .css-1d391kg .stMarkdown {{
+        color: #FFFFFF !important;
+    }}
+    
+    .css-1d391kg .stMarkdown h1, .css-1d391kg .stMarkdown h2, .css-1d391kg .stMarkdown h3 {{
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+    }}
+    
+    /* Textos adicionais do sidebar */
+    .stSidebar .stMarkdown {{
+        color: #FFFFFF !important;
+    }}
+    
+    .stSidebar .stMarkdown h1, .stSidebar .stMarkdown h2, .stSidebar .stMarkdown h3 {{
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+    }}
+    
+    [data-testid="stSidebar"] .stMarkdown {{
+        color: #FFFFFF !important;
+    }}
+    
+    [data-testid="stSidebar"] .stMarkdown h1, 
+    [data-testid="stSidebar"] .stMarkdown h2, 
+    [data-testid="stSidebar"] .stMarkdown h3 {{
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+    }}
+    
+    /* Inputs do sidebar com fundo escuro para contraste com preto */
+    .css-1d391kg .stSelectbox > div > div > div {{
+        background: #1a1a1a !important;
+        border: 2px solid #404040 !important;
+        color: #FFFFFF !important;
+    }}
+    
+    .css-1d391kg .stTextInput > div > div > input {{
+        background: #1a1a1a !important;
+        border: 2px solid #404040 !important;
+        color: #FFFFFF !important;
+    }}
+    
+    /* Inputs adicionais do sidebar */
+    .stSidebar .stSelectbox > div > div > div {{
+        background: #1a1a1a !important;
+        border: 2px solid #404040 !important;
+        color: #FFFFFF !important;
+    }}
+    
+    .stSidebar .stTextInput > div > div > input {{
+        background: #1a1a1a !important;
+        border: 2px solid #404040 !important;
+        color: #FFFFFF !important;
+    }}
+    
+    [data-testid="stSidebar"] .stSelectbox > div > div > div {{
+        background: #1a1a1a !important;
+        border: 2px solid #404040 !important;
+        color: #FFFFFF !important;
+    }}
+    
+    [data-testid="stSidebar"] .stTextInput > div > div > input {{
+        background: #1a1a1a !important;
+        border: 2px solid #404040 !important;
+        color: #FFFFFF !important;
+    }}
+    
+    /* Botões do sidebar */
+    .css-1d391kg .stButton > button {{
+        background: var(--gradient-primary) !important;
+        color: white !important;
+        border: none !important;
+        font-weight: 600 !important;
+    }}
+    
+    .stSidebar .stButton > button {{
+        background: var(--gradient-primary) !important;
+        color: white !important;
+        border: none !important;
+        font-weight: 600 !important;
+    }}
+    
+    [data-testid="stSidebar"] .stButton > button {{
+        background: var(--gradient-primary) !important;
+        color: white !important;
+        border: none !important;
+        font-weight: 600 !important;
+    }}
+    
+    /* Checkboxes e labels do sidebar */
+    .css-1d391kg .stCheckbox > label {{
+        color: #FFFFFF !important;
+    }}
+    
+    .stSidebar .stCheckbox > label {{
+        color: #FFFFFF !important;
+    }}
+    
+    [data-testid="stSidebar"] .stCheckbox > label {{
+        color: #FFFFFF !important;
+    }}
+    
+    /* Expanders do sidebar com fundo escuro */
+    .css-1d391kg .stExpander > div > div {{
+        background: #1a1a1a !important;
+        border: 1px solid #404040 !important;
+    }}
+    
+    .css-1d391kg .stExpander summary {{
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+        background: #1a1a1a !important;
+    }}
+    
+    .stSidebar .stExpander > div > div {{
+        background: #1a1a1a !important;
+        border: 1px solid #404040 !important;
+    }}
+    
+    .stSidebar .stExpander summary {{
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+        background: #1a1a1a !important;
+    }}
+    
+    [data-testid="stSidebar"] .stExpander > div > div {{
+        background: #1a1a1a !important;
+        border: 1px solid #404040 !important;
+    }}
+    
+    [data-testid="stSidebar"] .stExpander summary {{
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+        background: #1a1a1a !important;
+    }}
+    
+    /* Métricas com melhor contraste */
     [data-testid="metric-container"] {{
-        background: var(--bg-card);
-        border-radius: var(--border-radius);
-        padding: var(--space-4);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--gray-700);
-        transition: all var(--transition-normal);
+        background: var(--bg-card) !important;
+        border-radius: var(--border-radius) !important;
+        padding: var(--space-4) !important;
+        box-shadow: var(--shadow) !important;
+        border: 1px solid var(--gray-600) !important;
+        transition: all var(--transition-normal) !important;
     }}
     
     [data-testid="metric-container"]:hover {{
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-        border-color: var(--primary);
+        transform: translateY(-1px) !important;
+        box-shadow: var(--shadow-md) !important;
+        border-color: var(--primary) !important;
     }}
     
+    [data-testid="metric-container"] [data-testid="metric-label"] {{
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        font-size: var(--text-sm) !important;
+    }}
+    
+    [data-testid="metric-container"] [data-testid="metric-value"] {{
+        color: var(--text-primary) !important;
+        font-weight: 700 !important;
+        font-size: var(--text-2xl) !important;
+    }}
+    
+    [data-testid="metric-container"] [data-testid="metric-delta"] {{
+        color: var(--text-secondary) !important;
+        font-weight: 500 !important;
+    }}
+
+    /* === MELHORIAS DE CONTRASTE PARA VALORES DAS MÉTRICAS === */
+
+    /* Valores das métricas com melhor contraste - especificamente para '0' */
+    [data-testid="metric-container"] [data-testid="metric-value"],
+    .metric-value {{
+        color: #FFFFFF !important;
+        font-weight: 800 !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+        font-size: var(--text-3xl) !important;
+        line-height: 1.1 !important;
+    }}
+
+    /* Específico para valores que aparecem como '0' - forçando branco puro */
+    div[class*="st-emotion-cache"] {{
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7) !important;
+    }}
+
+    /* Container das métricas com fundo mais escuro para melhor contraste */
+    [data-testid="metric-container"] {{
+        background: linear-gradient(135deg, #1E293B 0%, #334155 100%) !important;
+        border: 2px solid #475569 !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+    }}
+
+    /* Hover das métricas com destaque ainda melhor */
+    [data-testid="metric-container"]:hover {{
+        background: linear-gradient(135deg, #334155 0%, #475569 100%) !important;
+        border-color: #0066FF !important;
+        box-shadow: 0 12px 35px rgba(0, 102, 255, 0.3) !important;
+        transform: translateY(-3px) !important;
+    }}
+
+    /* Labels das métricas com contraste otimizado */
+    [data-testid="metric-container"] [data-testid="metric-label"] {{
+        color: #E2E8F0 !important;
+        font-weight: 600 !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    }}
+
+    /* Delta das métricas com cores mais vibrantes */
+    [data-testid="metric-container"] [data-testid="metric-delta"] {{
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+    }}
+
+    [data-testid="metric-container"] [data-testid="metric-delta"][class*="positive"] {{
+        color: #4DD678 !important;
+        font-weight: 700 !important;
+    }}
+
+    [data-testid="metric-container"] [data-testid="metric-delta"][class*="negative"] {{
+        color: #FF6B7A !important;
+        font-weight: 700 !important;
+    }}
+
     /* Botões */
     .stButton > button {{
         background: var(--gradient-primary) !important;
@@ -300,53 +533,249 @@ def get_modern_css() -> str:
         border-color: var(--gray-500) !important;
     }}
     
-    /* Inputs */
+    /* Inputs com melhor contraste */
     .stTextInput > div > div > input {{
-        background: var(--bg-tertiary) !important;
-        border: 1px solid var(--gray-600) !important;
+        background: {colors.get('background_input', colors['background_tertiary'])} !important;
+        border: 2px solid var(--gray-500) !important;
         border-radius: var(--border-radius) !important;
         color: var(--text-primary) !important;
         padding: var(--space-3) !important;
+        font-size: var(--text-base) !important;
         transition: all var(--transition-normal) !important;
     }}
     
     .stTextInput > div > div > input:focus {{
         border-color: var(--primary) !important;
-        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1) !important;
+        background: {colors.get('background_input_focus', colors['background_tertiary'])} !important;
+        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2) !important;
+        color: white !important;
     }}
     
-    .stSelectbox > div > div > select {{
-        background: var(--bg-tertiary) !important;
-        border: 1px solid var(--gray-600) !important;
+    .stTextInput > div > div > input::placeholder {{
+        color: var(--text-muted) !important;
+        opacity: 0.8 !important;
+    }}
+    
+    .stSelectbox > div > div > div {{
+        background: {colors.get('background_input', colors['background_tertiary'])} !important;
+        border: 2px solid var(--gray-500) !important;
         border-radius: var(--border-radius) !important;
+        color: var(--text-primary) !important;
+        font-size: var(--text-base) !important;
+    }}
+    
+    .stSelectbox > div > div > div:hover {{
+        border-color: var(--primary) !important;
+        background: {colors.get('background_input_focus', colors['background_tertiary'])} !important;
+    }}
+    
+    .stNumberInput > div > div > input {{
+        background: {colors.get('background_input', colors['background_tertiary'])} !important;
+        border: 2px solid var(--gray-500) !important;
+        border-radius: var(--border-radius) !important;
+        color: var(--text-primary) !important;
+        padding: var(--space-3) !important;
+        font-size: var(--text-base) !important;
+        transition: all var(--transition-normal) !important;
+    }}
+    
+    .stNumberInput > div > div > input:focus {{
+        border-color: var(--primary) !important;
+        background: {colors.get('background_input_focus', colors['background_tertiary'])} !important;
+        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2) !important;
+        color: white !important;
+    }}
+    
+    .stTextArea > div > div > textarea {{
+        background: {colors.get('background_input', colors['background_tertiary'])} !important;
+        border: 2px solid var(--gray-500) !important;
+        border-radius: var(--border-radius) !important;
+        color: var(--text-primary) !important;
+        padding: var(--space-3) !important;
+        font-size: var(--text-base) !important;
+        transition: all var(--transition-normal) !important;
+    }}
+    
+    .stTextArea > div > div > textarea:focus {{
+        border-color: var(--primary) !important;
+        background: {colors.get('background_input_focus', colors['background_tertiary'])} !important;
+        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2) !important;
+        color: white !important;
+    }}
+    
+    /* === TABELAS E DATAFRAMES OTIMIZADAS === */
+    
+    /* Streamlit Dataframes */
+    .stDataFrame > div {{
+        background: var(--bg-card) !important;
+        border-radius: var(--border-radius) !important;
+        overflow: hidden !important;
+        box-shadow: var(--shadow-md) !important;
+        border: 2px solid var(--gray-600) !important;
+    }}
+    
+    .stDataFrame table {{
+        background: var(--bg-card) !important;
         color: var(--text-primary) !important;
     }}
     
-    /* Tabelas */
+    .stDataFrame thead th {{
+        background: var(--primary) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        padding: var(--space-4) !important;
+        border-bottom: 2px solid var(--primary-dark) !important;
+        font-size: var(--text-sm) !important;
+        text-align: left !important;
+        letter-spacing: 0.5px !important;
+    }}
+    
+    .stDataFrame tbody td {{
+        background: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+        padding: var(--space-3) !important;
+        border-bottom: 1px solid var(--gray-600) !important;
+        font-size: var(--text-sm) !important;
+        font-weight: 500 !important;
+    }}
+    
+    .stDataFrame tbody tr:nth-child(even) td {{
+        background: var(--bg-secondary) !important;
+    }}
+    
+    .stDataFrame tbody tr:hover td {{
+        background: var(--bg-tertiary) !important;
+        color: white !important;
+        transform: scale(1.001) !important;
+        transition: all var(--transition-fast) !important;
+    }}
+    
+    .stDataFrame .col_heading {{
+        background: var(--primary) !important;
+        color: white !important;
+        font-weight: 700 !important;
+    }}
+    
+    .stDataFrame .row_heading {{
+        background: var(--bg-tertiary) !important;
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+    }}
+    
+    .stDataFrame .data {{
+        background: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+    }}
+    
+    /* Tabelas padrão HTML/CSS */
     .dataframe {{
         background: var(--bg-card) !important;
         border-radius: var(--border-radius) !important;
         overflow: hidden !important;
-        box-shadow: var(--shadow) !important;
+        box-shadow: var(--shadow-md) !important;
+        border: 2px solid var(--gray-600) !important;
     }}
     
     .dataframe th {{
-        background: var(--bg-tertiary) !important;
-        color: var(--text-primary) !important;
-        font-weight: 600 !important;
-        padding: var(--space-3) !important;
-        border-bottom: 1px solid var(--gray-600) !important;
+        background: var(--primary) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        padding: var(--space-4) !important;
+        border-bottom: 2px solid var(--primary-dark) !important;
+        font-size: var(--text-sm) !important;
+        text-align: left !important;
     }}
     
     .dataframe td {{
         background: var(--bg-card) !important;
-        color: var(--text-secondary) !important;
+        color: var(--text-primary) !important;
         padding: var(--space-3) !important;
-        border-bottom: 1px solid var(--gray-700) !important;
+        border-bottom: 1px solid var(--gray-600) !important;
+        font-size: var(--text-sm) !important;
+        font-weight: 500 !important;
+    }}
+    
+    .dataframe tr:nth-child(even) td {{
+        background: var(--bg-secondary) !important;
     }}
     
     .dataframe tr:hover td {{
         background: var(--bg-tertiary) !important;
+        color: white !important;
+    }}
+    
+    /* Casos específicos de tabelas */
+    table {{
+        background: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+        border-collapse: collapse !important;
+    }}
+    
+    th {{
+        background: var(--primary) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        padding: var(--space-3) !important;
+        border: 1px solid var(--gray-600) !important;
+    }}
+    
+    td {{
+        background: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+        padding: var(--space-3) !important;
+        border: 1px solid var(--gray-700) !important;
+    }}
+    
+    /* Labels e textos de formulário */
+    .stTextInput > label {{
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        font-size: var(--text-sm) !important;
+        margin-bottom: var(--space-1) !important;
+    }}
+    
+    .stSelectbox > label {{
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        font-size: var(--text-sm) !important;
+        margin-bottom: var(--space-1) !important;
+    }}
+    
+    .stNumberInput > label {{
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        font-size: var(--text-sm) !important;
+        margin-bottom: var(--space-1) !important;
+    }}
+    
+    .stTextArea > label {{
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        font-size: var(--text-sm) !important;
+        margin-bottom: var(--space-1) !important;
+    }}
+    
+    /* Markdown e textos gerais */
+    .stMarkdown {{
+        color: var(--text-secondary) !important;
+    }}
+    
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {{
+        color: var(--text-primary) !important;
+    }}
+    
+    .stMarkdown p {{
+        color: var(--text-secondary) !important;
+        line-height: 1.6 !important;
+    }}
+    
+    .stMarkdown strong {{
+        color: var(--text-primary) !important;
+    }}
+    
+    .stCaption {{
+        color: var(--text-tertiary) !important;
+        font-size: var(--text-xs) !important;
     }}
     
     /* Tabs */
@@ -376,68 +805,188 @@ def get_modern_css() -> str:
         color: white !important;
     }}
     
-    /* Alertas */
+    /* === ALERTAS E MENSAGENS OTIMIZADAS === */
     .stAlert {{
         border-radius: var(--border-radius) !important;
         border: none !important;
         padding: var(--space-4) !important;
+        font-weight: 500 !important;
+        font-size: var(--text-sm) !important;
+        box-shadow: var(--shadow) !important;
     }}
     
     .stSuccess {{
-        background: rgba(0, 200, 81, 0.1) !important;
+        background: rgba(0, 200, 81, 0.15) !important;
         color: var(--success-light) !important;
         border-left: 4px solid var(--success) !important;
+        border: 1px solid rgba(0, 200, 81, 0.3) !important;
     }}
     
     .stWarning {{
-        background: rgba(255, 179, 0, 0.1) !important;
+        background: rgba(255, 179, 0, 0.15) !important;
         color: var(--warning-light) !important;
         border-left: 4px solid var(--warning) !important;
+        border: 1px solid rgba(255, 179, 0, 0.3) !important;
     }}
     
     .stError {{
-        background: rgba(255, 53, 71, 0.1) !important;
+        background: rgba(255, 53, 71, 0.15) !important;
         color: var(--error-light) !important;
         border-left: 4px solid var(--error) !important;
+        border: 1px solid rgba(255, 53, 71, 0.3) !important;
     }}
     
     .stInfo {{
-        background: rgba(23, 162, 184, 0.1) !important;
+        background: rgba(23, 162, 184, 0.15) !important;
         color: var(--info-light) !important;
         border-left: 4px solid var(--info) !important;
+        border: 1px solid rgba(23, 162, 184, 0.3) !important;
     }}
     
-    /* ===== CLASSES UTILITÁRIAS ===== */
+    /* Mensagens específicas do Streamlit */
+    .stAlert > div {{
+        color: inherit !important;
+        font-size: var(--text-sm) !important;
+    }}
+    
+    /* Status badges personalizados */
+    .status-badge {{
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: var(--space-1) var(--space-3) !important;
+        border-radius: var(--border-radius-sm) !important;
+        font-size: var(--text-xs) !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }}
+    
+    .status-disponivel {{
+        background: rgba(0, 200, 81, 0.2) !important;
+        color: var(--success-light) !important;
+        border: 1px solid var(--success) !important;
+    }}
+    
+    .status-indisponivel {{
+        background: rgba(255, 53, 71, 0.2) !important;
+        color: var(--error-light) !important;
+        border: 1px solid var(--error) !important;
+    }}
+    
+    .status-manutencao {{
+        background: rgba(255, 179, 0, 0.2) !important;
+        color: var(--warning-light) !important;
+        border: 1px solid var(--warning) !important;
+    }}
+    
+    /* === CONTAINERS E COLUNAS STREAMLIT === */
+    
+    .stContainer {{
+        color: var(--text-primary) !important;
+    }}
+    
+    .stColumn {{
+        color: var(--text-primary) !important;
+    }}
+    
+    .stExpander {{
+        background: var(--bg-secondary) !important;
+        border-radius: var(--border-radius) !important;
+        border: 1px solid var(--gray-600) !important;
+    }}
+    
+    .stExpander > div > div > div {{
+        color: var(--text-primary) !important;
+    }}
+    
+    .stExpander summary {{
+        background: var(--bg-tertiary) !important;
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        padding: var(--space-3) !important;
+        border-radius: var(--border-radius-sm) !important;
+    }}
+    
+    .stExpander summary:hover {{
+        background: var(--bg-tertiary) !important;
+        color: white !important;
+    }}
+    
+    /* Containers de métricas personalizados */
+    .metric-container {{
+        background: var(--bg-card) !important;
+        border-radius: var(--border-radius) !important;
+        padding: var(--space-4) !important;
+        box-shadow: var(--shadow) !important;
+        border: 1px solid var(--gray-600) !important;
+        margin: var(--space-2) 0 !important;
+    }}
+    
+    .metric-label {{
+        color: var(--text-secondary) !important;
+        font-size: var(--text-sm) !important;
+        font-weight: 600 !important;
+        margin-bottom: var(--space-1) !important;
+    }}
+    
+    .metric-value {{
+        color: var(--text-primary) !important;
+        font-size: var(--text-2xl) !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+    }}
+    
+    .metric-delta {{
+        color: var(--text-tertiary) !important;
+        font-size: var(--text-xs) !important;
+        font-weight: 500 !important;
+        margin-top: var(--space-1) !important;
+    }}
+    
+    /* Progress bars */
+    .stProgress > div > div > div {{
+        background: var(--primary) !important;
+    }}
+    
+    .stProgress > div > div {{
+        background: var(--bg-tertiary) !important;
+    }}
+    
+    /* === CLASSES UTILITÁRIAS MELHORADAS === */
     .text-center {{ text-align: center; }}
     .text-right {{ text-align: right; }}
     .font-bold {{ font-weight: 700; }}
     .font-semibold {{ font-weight: 600; }}
     .font-medium {{ font-weight: 500; }}
     
-    .text-primary {{ color: var(--text-primary); }}
-    .text-secondary {{ color: var(--text-secondary); }}
-    .text-muted {{ color: var(--text-muted); }}
+    .text-primary {{ color: var(--text-primary) !important; }}
+    .text-secondary {{ color: var(--text-secondary) !important; }}
+    .text-tertiary {{ color: var(--text-tertiary) !important; }}
+    .text-muted {{ color: var(--text-muted) !important; }}
+    .text-white {{ color: white !important; }}
     
-    .bg-primary {{ background-color: var(--primary); }}
-    .bg-success {{ background-color: var(--success); }}
-    .bg-warning {{ background-color: var(--warning); }}
-    .bg-error {{ background-color: var(--error); }}
+    .bg-primary {{ background-color: var(--primary) !important; }}
+    .bg-secondary {{ background-color: var(--bg-secondary) !important; }}
+    .bg-card {{ background-color: var(--bg-card) !important; }}
+    .bg-success {{ background-color: var(--success) !important; }}
+    .bg-warning {{ background-color: var(--warning) !important; }}
+    .bg-error {{ background-color: var(--error) !important; }}
     
-    .border-primary {{ border-color: var(--primary); }}
-    .border-success {{ border-color: var(--success); }}
-    .border-warning {{ border-color: var(--warning); }}
-    .border-error {{ border-color: var(--error); }}
+    .border-primary {{ border-color: var(--primary) !important; }}
+    .border-success {{ border-color: var(--success) !important; }}
+    .border-warning {{ border-color: var(--warning) !important; }}
+    .border-error {{ border-color: var(--error) !important; }}
     
-    .rounded {{ border-radius: var(--border-radius); }}
-    .rounded-sm {{ border-radius: var(--border-radius-sm); }}
-    .rounded-lg {{ border-radius: var(--border-radius-lg); }}
+    .rounded {{ border-radius: var(--border-radius) !important; }}
+    .rounded-sm {{ border-radius: var(--border-radius-sm) !important; }}
+    .rounded-lg {{ border-radius: var(--border-radius-lg) !important; }}
     
-    .shadow {{ box-shadow: var(--shadow); }}
-    .shadow-md {{ box-shadow: var(--shadow-md); }}
-    .shadow-lg {{ box-shadow: var(--shadow-lg); }}
+    .shadow {{ box-shadow: var(--shadow) !important; }}
+    .shadow-md {{ box-shadow: var(--shadow-md) !important; }}
+    .shadow-lg {{ box-shadow: var(--shadow-lg) !important; }}
     
-    .transition {{ transition: all var(--transition-normal); }}
-    .transition-fast {{ transition: all var(--transition-fast); }}
+    .transition {{ transition: all var(--transition-normal) !important; }}
+    .transition-fast {{ transition: all var(--transition-fast) !important; }}
     
     /* ===== RESPONSIVIDADE ===== */
     @media (max-width: 768px) {{

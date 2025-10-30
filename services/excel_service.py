@@ -24,13 +24,28 @@ class ExcelService:
                 logger.info(f"Carregando dados do arquivo {self.excel_file}")
                 
                 try:
-                    df_estoque = pd.read_excel(self.excel_file, sheet_name=self.sheet_estoque)
+                    # Forçar codigo_produto como string ao ler
+                    df_estoque = pd.read_excel(
+                        self.excel_file, 
+                        sheet_name=self.sheet_estoque,
+                        dtype={'codigo_produto': str}
+                    )
+                    # Garantir que codigo_produto é string
+                    if 'codigo_produto' in df_estoque.columns:
+                        df_estoque['codigo_produto'] = df_estoque['codigo_produto'].astype(str)
                 except Exception as e:
                     logger.warning(f"Erro ao ler sheet de estoque: {e}. Criando novo.")
                     df_estoque = pd.DataFrame()
                 
                 try:
-                    df_movimentacoes = pd.read_excel(self.excel_file, sheet_name=self.sheet_movimentacoes)
+                    # Forçar codigo_produto como string em movimentações também
+                    df_movimentacoes = pd.read_excel(
+                        self.excel_file, 
+                        sheet_name=self.sheet_movimentacoes,
+                        dtype={'codigo_produto': str}
+                    )
+                    if 'codigo_produto' in df_movimentacoes.columns:
+                        df_movimentacoes['codigo_produto'] = df_movimentacoes['codigo_produto'].astype(str)
                 except Exception as e:
                     logger.warning(f"Erro ao ler sheet de movimentações: {e}. Criando novo.")
                     df_movimentacoes = pd.DataFrame()
@@ -80,48 +95,37 @@ class ExcelService:
         return df_estoque
     
     def _criar_dados_iniciais(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """Cria estrutura inicial do Excel com dados de exemplo incluindo condição Novo/Usado"""
+        """Cria estrutura inicial do Excel VAZIA para testes manuais"""
+        # Criar DataFrames vazios mas com estrutura correta das colunas
         df_estoque = pd.DataFrame({
-            'id': [1, 2, 3, 4, 5, 6, 7, 8],
-            'equipamento': [
-                'Notebook Dell Latitude', 'Notebook Dell Latitude', 
-                'Monitor LG 24"', 'Monitor LG 24"',
-                'Impressora HP LaserJet', 'Switch Cisco 24P', 
-                'Servidor Dell PowerEdge', 'Mouse Logitech'
-            ],
-            'categoria': ['Notebook', 'Notebook', 'Monitor', 'Monitor', 'Impressora', 'Rede', 'Servidor', 'Periféricos'],
-            'marca': ['Dell', 'Dell', 'LG', 'LG', 'HP', 'Cisco', 'Dell', 'Logitech'],
-            'modelo': ['Latitude 5520', 'Latitude 5520', '24ML600', '24ML600', 'LaserJet Pro', 'Catalyst 2960', 'PowerEdge R740', 'MX Master 3'],
-            'codigo_produto': ['NB-DELL-001', 'NB-DELL-001', 'MON-LG-002', 'MON-LG-002', 'IMP-HP-003', 'SW-CISCO-004', 'SRV-DELL-005', 'MS-LOG-006'],
-            'quantidade': [10, 5, 15, 10, 8, 12, 3, 20],
-            'valor_unitario': [3500.00, 2450.00, 800.00, 560.00, 1200.00, 2500.00, 15000.00, 320.00],
-            'data_chegada': ['2024-01-15', '2024-01-15', '2024-02-10', '2024-02-10', '2024-01-20', '2024-03-05', '2024-02-28', '2024-03-10'],
-            'fornecedor': ['Dell Brasil', 'Dell Outlet', 'LG Electronics', 'LG Outlet', 'HP Brasil', 'Cisco Systems', 'Dell Brasil', 'Logitech'],
-            'status': ['Disponível', 'Disponível', 'Disponível', 'Disponível', 'Disponível', 'Disponível', 'Disponível', 'Disponível'],
-            'condicao': [
-                CondicionEquipamento.NOVO.value, CondicionEquipamento.USADO.value,
-                CondicionEquipamento.NOVO.value, CondicionEquipamento.USADO.value,
-                CondicionEquipamento.NOVO.value, CondicionEquipamento.NOVO.value,
-                CondicionEquipamento.NOVO.value, CondicionEquipamento.NOVO.value
-            ]
+            'id': pd.Series([], dtype='int64'),
+            'equipamento': pd.Series([], dtype='object'),
+            'categoria': pd.Series([], dtype='object'),
+            'marca': pd.Series([], dtype='object'),
+            'modelo': pd.Series([], dtype='object'),
+            'codigo_produto': pd.Series([], dtype='object'),
+            'quantidade': pd.Series([], dtype='int64'),
+            'valor_unitario': pd.Series([], dtype='float64'),
+            'data_chegada': pd.Series([], dtype='object'),
+            'fornecedor': pd.Series([], dtype='object'),
+            'status': pd.Series([], dtype='object'),
+            'condicao': pd.Series([], dtype='object')
         })
         
         df_movimentacoes = pd.DataFrame({
-            'id': [1, 2, 3, 4],
-            'equipamento_id': [1, 2, 3, 4],
-            'tipo_movimentacao': ['Entrada', 'Entrada', 'Saída', 'Entrada'],
-            'quantidade': [10, 5, 5, 15],
-            'data_movimentacao': ['2024-01-15', '2024-01-15', '2024-02-15', '2024-02-10'],
-            'destino_origem': ['Fornecedor: Dell Brasil', 'Dell Outlet', 'Loja: Shopping Center', 'Fornecedor: LG Electronics'],
-            'observacoes': ['Compra inicial - Equipamentos novos', 'Compra de equipamentos usados', 'Transferência para loja', 'Compra inicial - Monitores novos'],
-            'codigo_produto': ['NB-DELL-001', 'NB-DELL-001', 'MON-LG-002', 'MON-LG-002'],
-            'condicao': [
-                CondicionEquipamento.NOVO.value, CondicionEquipamento.USADO.value,
-                CondicionEquipamento.USADO.value, CondicionEquipamento.NOVO.value
-            ]
+            'id': pd.Series([], dtype='int64'),
+            'equipamento_id': pd.Series([], dtype='int64'),
+            'tipo_movimentacao': pd.Series([], dtype='object'),
+            'quantidade': pd.Series([], dtype='int64'),
+            'data_movimentacao': pd.Series([], dtype='object'),
+            'destino_origem': pd.Series([], dtype='object'),
+            'observacoes': pd.Series([], dtype='object'),
+            'codigo_produto': pd.Series([], dtype='object'),
+            'condicao': pd.Series([], dtype='object')
         })
         
         self.salvar_dados(df_estoque, df_movimentacoes)
+        logger.info("✅ Estrutura de dados VAZIA criada para testes manuais")
         return df_estoque, df_movimentacoes
     
     def _migrar_para_novo_usado(self, df_estoque: pd.DataFrame) -> pd.DataFrame:
@@ -251,11 +255,23 @@ class ExcelService:
         return df_movimentacoes
     
     def salvar_dados(self, df_estoque: pd.DataFrame, df_movimentacoes: pd.DataFrame) -> bool:
-        """Salva dados no Excel"""
+        """Salva dados no Excel garantindo tipos corretos"""
         try:
+            # Fazer cópias para não modificar originais
+            df_estoque_save = df_estoque.copy()
+            df_movimentacoes_save = df_movimentacoes.copy()
+            
+            # Garantir que codigo_produto é sempre salvo como STRING
+            if 'codigo_produto' in df_estoque_save.columns:
+                df_estoque_save['codigo_produto'] = df_estoque_save['codigo_produto'].astype(str)
+            
+            if 'codigo_produto' in df_movimentacoes_save.columns:
+                df_movimentacoes_save['codigo_produto'] = df_movimentacoes_save['codigo_produto'].astype(str)
+            
             with pd.ExcelWriter(self.excel_file, engine='openpyxl') as writer:
-                df_estoque.to_excel(writer, sheet_name=self.sheet_estoque, index=False)
-                df_movimentacoes.to_excel(writer, sheet_name=self.sheet_movimentacoes, index=False)
+                df_estoque_save.to_excel(writer, sheet_name=self.sheet_estoque, index=False)
+                df_movimentacoes_save.to_excel(writer, sheet_name=self.sheet_movimentacoes, index=False)
+            
             logger.info(f"Dados salvos com sucesso em {self.excel_file}")
             return True
         except Exception as e:

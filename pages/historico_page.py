@@ -11,8 +11,9 @@ from loguru import logger
 from services.estoque_service import EstoqueService
 from utils.plotly_utils import create_bar_chart, create_line_chart
 from utils.ui_utils import (
-    create_form_section, create_data_table, format_dataframe_for_display,
-    create_filter_sidebar, create_info_cards, show_success_message, show_toast
+    create_form_section,
+    show_success_message,
+    show_toast
 )
 
 class HistoricoMovimentacoesPageProfessional:
@@ -317,16 +318,16 @@ class HistoricoMovimentacoesPageProfessional:
             if filtros.get('busca_equipamento'):
                 busca = filtros['busca_equipamento'].lower()
                 
-                # Buscar nas observações (que contém info do equipamento)
-                mask_obs = df_filtrado['observacoes'].str.lower().str.contains(busca, na=False)
-                mask_destino = df_filtrado['destino_origem'].str.lower().str.contains(busca, na=False)
+                # Buscar nas observações (que contém info do equipamento) - CORRIGIDO
+                mask_obs = df_filtrado['observacoes'].astype(str).str.lower().str.contains(busca, na=False)
+                mask_destino = df_filtrado['destino_origem'].astype(str).str.lower().str.contains(busca, na=False)
                 
                 df_filtrado = df_filtrado[mask_obs | mask_destino]
             
-            # Busca por código
+            # Busca por código - CORRIGIDO
             if filtros.get('busca_codigo'):
                 codigo = filtros['busca_codigo'].upper()
-                mask_codigo = df_filtrado['codigo_produto'].str.upper().str.contains(codigo, na=False)
+                mask_codigo = df_filtrado['codigo_produto'].astype(str).str.upper().str.contains(codigo, na=False)
                 df_filtrado = df_filtrado[mask_codigo]
             
         except Exception as e:

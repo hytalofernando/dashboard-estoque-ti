@@ -25,7 +25,8 @@ def show_toast(message: str, icon: Optional[str] = None) -> None:
 
 
 def create_metric_card(label: str, value: str, delta: Optional[str] = None, help_text: Optional[str] = None) -> None:
-    """Cria card de métrica moderno"""
+    """Cria card de métrica moderno com alto contraste"""
+    # Sempre usar st.metric para evitar problemas de renderização HTML
     st.metric(
         label=label,
         value=value,
@@ -52,15 +53,6 @@ def show_info_message(message: str) -> None:
     """Exibe mensagem informativa com toast"""
     st.info(message)
     show_toast(message, "ℹ️")
-
-def create_status_indicator(status: str) -> str:
-    """Cria indicador visual de status"""
-    status_map = {
-        "Disponível": "🟢",
-        "Indisponível": "🔴", 
-        "Manutenção": "🟡"
-    }
-    return f"{status_map.get(status, '⚪')} {status}"
 
 def format_currency(value: float) -> str:
     """Formata valor monetário"""
@@ -102,53 +94,40 @@ def create_info_cards(stats: Dict[str, Any]) -> None:
 
 
 
-def create_filter_sidebar(df, title: str = "🔍 Filtros") -> Dict[str, Any]:
-    """Cria sidebar de filtros"""
-    st.sidebar.markdown(f"## {title}")
-    
-    filters = {}
-    
-    # Filtro por categoria
-    if 'categoria' in df.columns:
-        categorias = ["Todas"] + sorted(df['categoria'].unique().tolist())
-        filters['categoria'] = st.sidebar.selectbox("Categoria", categorias)
-    
-    # Filtro por marca
-    if 'marca' in df.columns:
-        marcas = ["Todas"] + sorted(df['marca'].unique().tolist())
-        filters['marca'] = st.sidebar.selectbox("Marca", marcas)
-    
-    # Filtro por status
-    if 'status' in df.columns:
-        status_list = ["Todos"] + sorted(df['status'].unique().tolist())
-        filters['status'] = st.sidebar.selectbox("Status", status_list)
-    
-    # Busca por código/nome
-    filters['busca'] = st.sidebar.text_input("🔍 Buscar por código ou nome")
-    
-    return filters
-
 def create_data_table(df, title: str = "📊 Dados", use_container_width: bool = True) -> None:
-    """Cria tabela de dados moderna"""
-    st.markdown(f"### {title}")
+    """Cria tabela de dados moderna com alto contraste"""
+    # Título simples sem HTML
+    st.subheader(title)
     
     if df.empty:
         st.info("Nenhum dado disponível")
         return
     
-    # Configurações da tabela moderna (Streamlit 1.42+)
+    # Configurações da tabela moderna (Streamlit 1.42+) com melhor contraste
     try:
         st.dataframe(
             df,
             use_container_width=use_container_width,
             hide_index=True,
             column_config={
-                # Configurações específicas por coluna se necessário
+                # Configurações específicas por coluna para melhor visibilidade
+                **{col: st.column_config.TextColumn(
+                    col,
+                    help=f"Dados da coluna {col}"
+                ) for col in df.columns if df[col].dtype == 'object'},
+                **{col: st.column_config.NumberColumn(
+                    col,
+                    help=f"Valores numéricos da coluna {col}",
+                    format="%.0f" if col in ['quantidade', 'id'] else "%.2f"
+                ) for col in df.columns if pd.api.types.is_numeric_dtype(df[col])}
             }
         )
-    except:
+    except Exception as e:
         # Fallback para versões antigas
         st.dataframe(df, use_container_width=use_container_width)
+        
+    # Informações adicionais sem HTML
+    st.caption(f"📊 Total de registros: **{len(df)}**")
 
 def create_form_section(title: str, description: Optional[str] = None):
     """Cria seção de formulário com título e descrição"""
@@ -156,43 +135,6 @@ def create_form_section(title: str, description: Optional[str] = None):
     if description:
         st.markdown(f"*{description}*")
     st.markdown("---")
-
-def create_action_buttons(primary_label: str, secondary_label: Optional[str] = None, 
-                         primary_type: str = "primary", disabled: bool = False) -> Dict[str, bool]:
-    """Cria botões de ação"""
-    col1, col2 = st.columns(2)
-    
-    buttons = {}
-    
-    with col1:
-        buttons['primary'] = st.button(
-            primary_label, 
-            type=primary_type,
-            disabled=disabled,
-            use_container_width=True
-        )
-    
-    with col2:
-        if secondary_label:
-            buttons['secondary'] = st.button(
-                secondary_label,
-                disabled=disabled,
-                use_container_width=True
-            )
-    
-    return buttons
-
-
-
-
-
-def show_confirmation_dialog(message: str, key: str) -> bool:
-    """Exibe diálogo de confirmação"""
-    return st.checkbox(f"✅ {message}", key=key)
-
-
-
-
 
 def format_dataframe_for_display(df):
     """Formata DataFrame para exibição"""
@@ -231,28 +173,30 @@ def normalizar_status_equipamento(status: str) -> str:
         # Fallback: assumir disponível se não conseguir determinar
         return "Disponível"
 
-def render_status_badge(status: str) -> None:
-    """Renderiza badge de status com cores semânticas melhoradas"""
-    status_normalizado = normalizar_status_equipamento(status)
-    
-    # Usar cores semânticas específicas para status
-    if status_normalizado == "Disponível":
-        st.markdown(
-            f'<span style="color: {settings.THEME_COLORS["status_available"]}; font-weight: 600;">🟢 {status_normalizado}</span>', 
-            unsafe_allow_html=True
-        )
-    elif status_normalizado == "Indisponível":
-        st.markdown(
-            f'<span style="color: {settings.THEME_COLORS["status_unavailable"]}; font-weight: 600;">🔴 {status_normalizado}</span>', 
-            unsafe_allow_html=True
-        )
-    elif status_normalizado == "Manutenção":
-        st.markdown(
-            f'<span style="color: {settings.THEME_COLORS["status_maintenance"]}; font-weight: 600;">🟡 {status_normalizado}</span>', 
-            unsafe_allow_html=True
-        )
-    else:
-        st.markdown(
-            f'<span style="color: {settings.THEME_COLORS["text_muted"]}; font-weight: 600;">⚪ {status_normalizado}</span>', 
-            unsafe_allow_html=True
-        ) 
+def clean_codigo_display(codigo) -> str:
+    """Limpa código removendo casas decimais desnecessárias (.00, .0)"""
+    if codigo is None:
+        return ""
+
+    # Converter para string
+    codigo_str = str(codigo).strip()
+
+    # Remover .00 ou .0 se for número inteiro
+    if '.00' in codigo_str:
+        # Verificar se é um número inteiro com .00
+        try:
+            num = float(codigo_str)
+            if num == int(num):
+                return str(int(num))
+        except ValueError:
+            pass
+    elif codigo_str.endswith('.0') and '.' in codigo_str:
+        # Verificar se termina com .0 e é número inteiro
+        try:
+            num = float(codigo_str)
+            if num == int(num):
+                return str(int(num))
+        except ValueError:
+            pass
+
+    return codigo_str

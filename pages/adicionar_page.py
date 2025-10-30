@@ -7,17 +7,20 @@ import streamlit as st
 import pandas as pd
 from typing import Optional, Dict, Any, List
 from loguru import logger
-from pydantic import ValidationError
 from datetime import datetime
-import io
 
 from services.estoque_service import EstoqueService
 from models.schemas import Equipamento, CondicionEquipamento
 from config.settings import settings
 from utils.ui_utils import (
-    create_form_section, show_success_message, show_error_message, 
-    show_warning_message, show_toast, create_action_buttons,
-    create_info_cards, normalizar_status_equipamento, render_status_badge
+    create_form_section,
+    show_success_message,
+    show_error_message,
+    show_warning_message,
+    show_toast,
+    create_info_cards,
+    create_metric_card,
+    clean_codigo_display
 )
 
 # ✅ SISTEMA DE AUTENTICAÇÃO
@@ -107,7 +110,7 @@ class AdicionarEquipamentoProfessional:
             
             cache_equipamentos = {}
             for _, row in df_estoque.iterrows():
-                codigo = str(row.get('codigo_produto', '')).strip().upper()
+                codigo = clean_codigo_display(row.get('codigo_produto', '')).upper()
                 if codigo:
                     cache_equipamentos[codigo] = {
                         'id': row.get('id'),
@@ -139,13 +142,20 @@ class AdicionarEquipamentoProfessional:
         # Sistema de busca avançado
         col_busca1, col_busca2, col_busca3, col_busca4 = st.columns([3, 1, 1, 1])
         
+        # Inicializar variáveis fora do contexto de colunas para garantir escopo
+        codigo_input = ""
+        
         with col_busca1:
-            codigo_input = st.text_input(
+            # Obter valor do input e garantir que sempre seja uma string válida
+            codigo_input_temp = st.text_input(
                 "🔍 Código Produto (AI Search)",
                 placeholder="Ex: NB-DELL-001 | Digite para autocompletar...",
                 help="Sistema de busca inteligente com sugestões automáticas",
                 key="codigo_search_modern"
-            ).strip().upper()
+            )
+            # Processar o código em etapas separadas para evitar problemas de escopo
+            if codigo_input_temp:
+                codigo_input = clean_codigo_display(str(codigo_input_temp).strip().upper())
         
         with col_busca2:
             if st.button("🔄 Refresh Cache", use_container_width=True):
@@ -322,48 +332,52 @@ class AdicionarEquipamentoProfessional:
         
         with col_filtro4:
             if st.button("📥 Exportar", use_container_width=True):
-                self._exportar_historico()
+                show_toast("📥 Exportação em desenvolvimento!", "🚧")
         
-        # Simular dados de histórico (integrar com banco real)
-        self._render_historico_mock()
+        # Histórico (em desenvolvimento)
+        st.info("📊 **Histórico em desenvolvimento** - Será integrado com o banco de movimentações")
     
     def _render_analytics_dashboard(self) -> None:
-        """Renderiza dashboard de analytics"""
+        """Renderiza dashboard de analytics com paleta de cores correta"""
         st.markdown("### 📊 Analytics Dashboard - Adições")
         
-        # Métricas em tempo real
+        # Métricas em tempo real com cores adequadas
         col_metric1, col_metric2, col_metric3, col_metric4 = st.columns(4)
         
         with col_metric1:
-            st.metric(
+            create_metric_card(
                 "📦 Adições Hoje", 
-                st.session_state.adicionar_stats['total_added_today'],
-                delta="+2 vs ontem"
+                str(st.session_state.adicionar_stats['total_added_today']),
+                delta="+2 vs ontem",
+                help_text="Total de equipamentos adicionados hoje"
             )
         
         with col_metric2:
-            st.metric(
+            create_metric_card(
                 "💰 Valor Hoje", 
                 f"R$ {st.session_state.adicionar_stats['total_value_added_today']:,.2f}",
-                delta="+15% vs ontem"
+                delta="+15% vs ontem",
+                help_text="Valor total adicionado hoje"
             )
         
         with col_metric3:
-            st.metric(
+            create_metric_card(
                 "⚡ Taxa Sucesso", 
                 "98.5%",
-                delta="+1.2%"
+                delta="+1.2%",
+                help_text="Taxa de sucesso nas adições"
             )
         
         with col_metric4:
-            st.metric(
+            create_metric_card(
                 "🎯 Autocompletar", 
                 "85%",
-                delta="+5%"
+                delta="+5%",
+                help_text="Eficiência do autocompletar"
             )
         
-        # Gráficos modernos (simular dados)
-        self._render_graficos_analytics()
+        # Gráficos (em desenvolvimento)
+        st.info("📈 **Gráficos em desenvolvimento** - Analytics avançados em breve")
     
     def _render_configuracoes_avancadas(self) -> None:
         """Renderiza configurações avançadas da página"""
@@ -431,11 +445,13 @@ class AdicionarEquipamentoProfessional:
         
         with col_cache2:
             if st.button("📊 Estatísticas Cache", use_container_width=True):
-                self._show_cache_stats()
+                show_toast("📊 Stats: Cache ativo com TTL 5min", "📈")
         
         with col_cache3:
             if st.button("🧹 Limpar Tudo", use_container_width=True):
-                self._clear_all_data()
+                self._invalidate_cache()
+                self._clear_form_state()
+                show_toast("🧹 Dados limpos!", "✅")
     
     @st.dialog("Quick Add - Adição Rápida")
     def _show_quick_add_dialog(self) -> None:
@@ -486,8 +502,12 @@ class AdicionarEquipamentoProfessional:
     
     def _processar_busca_inteligente(self, codigo_input: str, equipamentos_cache: Dict) -> Optional[Dict]:
         """Processa busca inteligente com sugestões e agrupamento Novo/Usado"""
-        if not codigo_input or len(codigo_input) < 2:
+        # Validação defensiva
+        if not codigo_input or not isinstance(codigo_input, str) or len(codigo_input.strip()) < 2:
             return None
+        
+        # Garantir que codigo_input é uma string limpa
+        codigo_input = str(codigo_input).strip().upper()
         
         # Buscar equipamentos por código (pode ter Novo e Usado)
         equipamentos_codigo = self.estoque_service.obter_equipamento_por_codigo(codigo_input)
@@ -529,9 +549,9 @@ class AdicionarEquipamentoProfessional:
             st.warning("⬆️ **Modo: Aumentar Estoque** - Selecione a condição para adicionar")
             return agrupado
         
-        # Busca aproximada
+        # Busca aproximada - usar código limpo para consistência
         all_codes = list(equipamentos_cache.keys()) if equipamentos_cache else []
-        similares = [codigo for codigo in all_codes if codigo_input in codigo]
+        similares = [codigo for codigo in all_codes if codigo_input in codigo or codigo in codigo_input]
         if similares:
             st.info(f"💡 **Códigos similares encontrados:** {', '.join(similares[:5])}")
         else:
@@ -940,20 +960,12 @@ class AdicionarEquipamentoProfessional:
     
     # Métodos auxiliares
     def _render_stats_realtime(self) -> None:
-        """Renderiza estatísticas em tempo real"""
+        """Renderiza estatísticas em tempo real com paleta de cores correta"""
         try:
             stats = self.estoque_service.obter_estatisticas()
             
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                st.metric("📦 Total Equipamentos", f"{stats.get('total_equipamentos', 0):,}")
-            with col2:
-                st.metric("📂 Categorias", stats.get('categorias_unicas', 0))
-            with col3:
-                st.metric("💰 Valor Total", f"R$ {stats.get('valor_total', 0):,.2f}")
-            with col4:
-                st.metric("✅ Disponíveis", f"{stats.get('disponiveis', 0):,}")
+            # Usar create_info_cards para paleta de cores adequada
+            create_info_cards(stats)
                 
         except Exception as e:
             logger.error(f"Erro nas estatísticas: {str(e)}")
@@ -1032,7 +1044,7 @@ class AdicionarEquipamentoProfessional:
         for idx, row in df_valido.iterrows():
             if len(str(row['equipamento']).strip()) < 2:
                 erros_lote.append(f"Linha {idx+1}: Nome deve ter pelo menos 2 caracteres")
-            if len(str(row['codigo_produto']).strip()) < 2:
+            if len(clean_codigo_display(row['codigo_produto'])) < 2:
                 erros_lote.append(f"Linha {idx+1}: Código deve ter pelo menos 2 caracteres")
             if row['quantidade'] <= 0:
                 erros_lote.append(f"Linha {idx+1}: Quantidade inválida")
@@ -1090,7 +1102,7 @@ class AdicionarEquipamentoProfessional:
                     categoria=str(row['categoria']).strip(),
                     marca=str(row['marca']).strip(),
                     modelo=str(row['modelo']).strip(),
-                    codigo_produto=str(row['codigo_produto']).strip().upper(),
+                    codigo_produto=clean_codigo_display(row['codigo_produto']).upper(),
                     quantidade=int(row['quantidade']),
                     valor_unitario=float(row['valor_unitario']),
                     fornecedor=str(row['fornecedor']).strip(),
@@ -1174,39 +1186,6 @@ class AdicionarEquipamentoProfessional:
         except Exception as e:
             logger.error(f"Erro na adição rápida: {str(e)}")
     
-    def _render_historico_mock(self) -> None:
-        """Renderiza histórico simulado"""
-        st.info("📊 **Histórico em desenvolvimento** - Será integrado com o banco de movimentações")
-        
-        # Dados simulados
-        df_hist = pd.DataFrame({
-            'Data': ['2024-01-21', '2024-01-21', '2024-01-20'],
-            'Equipamento': ['Notebook Dell', 'Mouse Logitech', 'Teclado Corsair'],
-            'Código': ['NB-DELL-001', 'MS-LOG-001', 'KB-COR-001'],
-            'Quantidade': [2, 5, 3],
-            'Valor': [7000.0, 125.0, 1350.0],
-            'Fornecedor': ['Dell Brasil', 'Logitech', 'Corsair']
-        })
-        
-        st.dataframe(df_hist, use_container_width=True)
-    
-    def _render_graficos_analytics(self) -> None:
-        """Renderiza gráficos de analytics simulados"""
-        st.info("📈 **Gráficos em desenvolvimento** - Analytics avançados em breve")
-    
-    def _exportar_historico(self) -> None:
-        """Exporta histórico"""
-        show_toast("📥 Exportação em desenvolvimento!", "🚧")
-    
-    def _show_cache_stats(self) -> None:
-        """Mostra estatísticas do cache"""
-        show_toast("📊 Stats: Cache ativo com TTL 5min", "📈")
-    
-    def _clear_all_data(self) -> None:
-        """Limpa todos os dados"""
-        self._invalidate_cache()
-        self._clear_form_state()
-        show_toast("🧹 Dados limpos!", "✅")
 
 
 def render_adicionar_page(estoque_service: EstoqueService) -> None:

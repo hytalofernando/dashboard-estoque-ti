@@ -10,8 +10,10 @@ from loguru import logger
 from services.estoque_service import EstoqueService
 from utils.plotly_utils import create_pie_chart, create_bar_chart
 from utils.ui_utils import (
-    create_form_section, create_data_table, format_dataframe_for_display,
-    show_toast, create_info_cards
+    create_form_section,
+    create_data_table,
+    format_dataframe_for_display,
+    show_toast
 )
 
 class CodigosPage:
@@ -168,14 +170,14 @@ class CodigosPage:
         if filtros.get('status') and filtros['status'] != "Todos":
             df_filtrado = df_filtrado[df_filtrado['status'] == filtros['status']]
         
-        # Busca por código ou nome
+        # Busca por código ou nome - CORRIGIDO
         if filtros.get('busca'):
             busca = filtros['busca'].lower()
             mask = (
-                df_filtrado['codigo_produto'].str.lower().str.contains(busca, na=False) |
-                df_filtrado['equipamento'].str.lower().str.contains(busca, na=False) |
-                df_filtrado['marca'].str.lower().str.contains(busca, na=False) |
-                df_filtrado['modelo'].str.lower().str.contains(busca, na=False)
+                df_filtrado['codigo_produto'].astype(str).str.lower().str.contains(busca, na=False) |
+                df_filtrado['equipamento'].astype(str).str.lower().str.contains(busca, na=False) |
+                df_filtrado['marca'].astype(str).str.lower().str.contains(busca, na=False) |
+                df_filtrado['modelo'].astype(str).str.lower().str.contains(busca, na=False)
             )
             df_filtrado = df_filtrado[mask]
         
@@ -306,8 +308,8 @@ class CodigosPage:
                 st.info("Códigos de produto não disponíveis para análise")
                 return
             
-            # Análise de prefixos
-            prefixos = df['codigo_produto'].str.split('-').str[0].value_counts()
+            # Análise de prefixos - CORRIGIDO
+            prefixos = df['codigo_produto'].astype(str).str.split('-').str[0].value_counts()
             
             col1, col2 = st.columns(2)
             
@@ -324,8 +326,8 @@ class CodigosPage:
             with col2:
                 st.markdown("#### 📊 Estatísticas dos Códigos")
                 
-                # Comprimento médio dos códigos
-                comprimento_medio = df['codigo_produto'].str.len().mean()
+                # Comprimento médio dos códigos - CORRIGIDO
+                comprimento_medio = df['codigo_produto'].astype(str).str.len().mean()
                 st.metric(
                     "Comprimento Médio",
                     f"{comprimento_medio:.1f} caracteres"
@@ -340,9 +342,9 @@ class CodigosPage:
                     delta=f"{(codigos_unicos/total_produtos)*100:.1f}%"
                 )
                 
-                # Padrões mais comuns
+                # Padrões mais comuns - CORRIGIDO
                 if not df.empty:
-                    padrao_mais_comum = df['codigo_produto'].str.extract(r'([A-Z]+-[A-Z]+)').iloc[:, 0].mode()
+                    padrao_mais_comum = df['codigo_produto'].astype(str).str.extract(r'([A-Z]+-[A-Z]+)').iloc[:, 0].mode()
                     if not padrao_mais_comum.empty:
                         st.metric(
                             "Padrão Mais Comum",

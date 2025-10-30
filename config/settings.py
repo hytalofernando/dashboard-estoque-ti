@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     MIN_VALOR: float = 0.01
     MAX_OBSERVACOES: int = 500
     
+    # Configuração de unicidade de código
+    # True = Código deve ser único (mesmo produto em diferentes condições)
+    # False = Código + condição deve ser único (produtos diferentes podem ter mesmo código)
+    CODIGO_UNICO_OBRIGATORIO: bool = False
+    
     # Sistema de cores profissional moderno
     THEME_COLORS: Dict[str, str] = {
         # === CORES PRIMÁRIAS CORPORATIVAS ===
@@ -84,18 +89,20 @@ class Settings(BaseSettings):
         "gray_800": "#1E293B",          # Cinza preto
         "gray_900": "#0F172A",          # Preto azulado
         
-        # === CORES DE FUNDO DARK THEME ===
+        # === CORES DE FUNDO DARK THEME MELHORADAS ===
         "background": "#0F172A",         # Fundo principal (gray-900)
         "background_secondary": "#1E293B", # Fundo secundário (gray-800)
-        "background_tertiary": "#334155",  # Fundo terciário (gray-700)
+        "background_tertiary": "#475569",  # Fundo terciário - mais claro para inputs
         "background_card": "#1E293B",      # Fundo de cards
         "background_sidebar": "#0F172A",   # Fundo da sidebar
+        "background_input": "#334155",     # Fundo específico para inputs
+        "background_input_focus": "#475569", # Fundo de inputs em foco
         
-        # === CORES DE TEXTO OTIMIZADAS ===
-        "text_primary": "#F8FAFC",       # Texto principal (gray-50)
-        "text_secondary": "#E2E8F0",     # Texto secundário (gray-200)
-        "text_tertiary": "#94A3B8",      # Texto terciário (gray-400)
-        "text_muted": "#64748B",         # Texto discreto (gray-500)
+        # === CORES DE TEXTO COM MELHOR CONTRASTE ===
+        "text_primary": "#FFFFFF",       # Texto principal - branco puro
+        "text_secondary": "#F1F5F9",     # Texto secundário - cinza muito claro
+        "text_tertiary": "#CBD5E1",      # Texto terciário - cinza claro (melhor contraste)
+        "text_muted": "#94A3B8",         # Texto discreto - mantido
         "text_inverse": "#0F172A",       # Texto em fundos claros
         
         # === CORES DE DESTAQUE ===

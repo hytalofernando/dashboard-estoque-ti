@@ -213,15 +213,15 @@ class LoginPage:
             st.markdown("""
             **Para obter credenciais de acesso:**
             
-            1. 📧 **Email:** ti@suaempresa.com
-            2. 📱 **Telefone:** (11) 9999-9999
+            1. 📧 **Email:** hytalo.souza@novoatacarejo.com
+            2. 📱 **Telefone:** --
             3. 💬 **Teams/Slack:** #suporte-ti
             4. 🎫 **Ticket:** Sistema de chamados interno
             
             **Informações necessárias:**
             - Nome completo
             - Cargo/Função
-            - Tipo de acesso necessário (Admin/Visualizador)
+            - Tipo de acesso necessário (Visualizador)
             - Justificativa de uso
             """)
         
