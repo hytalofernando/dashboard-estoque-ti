@@ -3,12 +3,12 @@ Dashboard Estoque TI
 
 """
 
-import streamlit as st
-import os
-
-# ✅ CARREGAR VARIÁVEIS DE AMBIENTE PRIMEIRO!
+# ✅ CARREGAR VARIÁVEIS DE AMBIENTE PRIMEIRO - ANTES DE TUDO!
 from dotenv import load_dotenv
 load_dotenv()
+
+import streamlit as st
+import os
 
 # Configuração de logging
 from loguru import logger

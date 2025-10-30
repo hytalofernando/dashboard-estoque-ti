@@ -198,26 +198,43 @@ class DashboardPage:
         """Renderiza gráfico de linha temporal"""
         try:
             df_temp = df.copy()
-            df_temp['data_chegada'] = pd.to_datetime(df_temp['data_chegada'])
+            
+            # Verificar qual coluna de data existe
+            coluna_data = None
+            if 'data_cadastro' in df_temp.columns:
+                coluna_data = 'data_cadastro'
+            elif 'Data Cadastro' in df_temp.columns:
+                coluna_data = 'Data Cadastro'
+            elif 'data_atualizacao' in df_temp.columns:
+                coluna_data = 'data_atualizacao'
+            elif 'Data Atualização' in df_temp.columns:
+                coluna_data = 'Data Atualização'
+            
+            if not coluna_data:
+                st.info("📅 Gráfico temporal não disponível (coluna de data não encontrada)")
+                return
+            
+            # Converter para datetime
+            df_temp[coluna_data] = pd.to_datetime(df_temp[coluna_data])
             
             # Agrupar por mês
-            df_temp['mes_ano'] = df_temp['data_chegada'].dt.to_period('M')
-            chegadas_por_mes = df_temp.groupby('mes_ano').size()
+            df_temp['mes_ano'] = df_temp[coluna_data].dt.to_period('M')
+            cadastros_por_mes = df_temp.groupby('mes_ano').size()
             
-            if not chegadas_por_mes.empty:
+            if not cadastros_por_mes.empty and len(cadastros_por_mes) > 1:
                 fig = create_line_chart(
-                    chegadas_por_mes.index.astype(str).tolist(),
-                    chegadas_por_mes.values.tolist(),
-                    '📅 Equipamentos Recebidos por Mês',
+                    cadastros_por_mes.index.astype(str).tolist(),
+                    cadastros_por_mes.values.tolist(),
+                    '📅 Equipamentos Cadastrados por Mês',
                     'Mês',
                     'Quantidade'
                 )
                 st.plotly_chart(fig, use_container_width=True)
             else:
-                st.info("Dados temporais insuficientes para gráfico")
+                st.info("📅 Dados insuficientes para gráfico temporal (necessário dados de múltiplos meses)")
         except Exception as e:
             logger.error(f"Erro ao criar gráfico temporal: {str(e)}")
-            st.error("Erro ao carregar gráfico temporal")
+            st.info("📅 Gráfico temporal temporariamente indisponível")
     
     # ===== NOVOS MÉTODOS - MELHORIAS FASE 1 =====
     

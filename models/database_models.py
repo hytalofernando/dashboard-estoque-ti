@@ -3,6 +3,10 @@ Modelos de Banco de Dados - Dashboard Estoque TI
 SQLAlchemy ORM Models para PostgreSQL
 """
 
+# ✅ Carregar variáveis de ambiente PRIMEIRO
+from dotenv import load_dotenv
+load_dotenv()
+
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker

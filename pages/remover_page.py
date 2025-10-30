@@ -135,15 +135,16 @@ class RemoverEquipamentoPageProfessional:
                     codigo = clean_codigo_display(row.get('codigo_produto', '')).upper()
                     if codigo:
                         cache_equipamentos[codigo] = {
-                            'id': row.get('id'),
+                            'codigo_produto': codigo,
                             'equipamento': row.get('equipamento', ''),
                             'categoria': row.get('categoria', ''),
                             'marca': row.get('marca', ''),
                             'modelo': row.get('modelo', ''),
                             'quantidade': row.get('quantidade', 0),
                             'valor_unitario': row.get('valor_unitario', 0.0),
-                            'fornecedor': row.get('fornecedor', ''),
-                            'status': row.get('status', '')
+                            'condicao': row.get('condicao', 'Novo'),
+                            'observacoes': row.get('observacoes', ''),
+                            'data_cadastro': row.get('data_cadastro', '')
                         }
                 
                 # ✅ ATUALIZAR CACHE E RESETAR FLAGS
@@ -369,8 +370,9 @@ class RemoverEquipamentoPageProfessional:
                 # Mostrar equipamentos encontrados com melhor organização
                 for i, equipamento in enumerate(equipamentos_encontrados):
                     # Destacar o termo buscado no título
-                    titulo_equipamento = f"📦 {equipamento['equipamento']} - {equipamento.get('codigo_produto', 'N/A')}"
-                    subtitulo = f"({equipamento['quantidade']} unidades disponíveis | R$ {equipamento['valor_unitario']:,.2f} cada)"
+                    # Acessar com .get() para evitar KeyError
+                    titulo_equipamento = f"📦 {equipamento.get('equipamento', 'N/A')} - {equipamento.get('codigo_produto', 'N/A')}"
+                    subtitulo = f"({equipamento.get('quantidade', 0)} unidades disponíveis | R$ {equipamento.get('valor_unitario', 0):,.2f} cada)"
                     
                     with st.expander(
                         f"{titulo_equipamento} {subtitulo}",
@@ -456,33 +458,45 @@ class RemoverEquipamentoPageProfessional:
                 st.caption("📉 Menos de 5 unidades")
     
     def _render_formulario_remocao_individual(self, equipamento: pd.Series) -> None:
-        """Renderiza formulário para remoção individual - COM DEBUGGING MELHORADO"""
+        """Renderiza formulário para remoção individual - TOTALMENTE SEM 'id'"""
+        
+        # Extrair dados do equipamento (pandas Series)
+        try:
+            codigo_produto = str(equipamento.get('codigo_produto', equipamento.name if hasattr(equipamento, 'name') else 'N/A'))
+            nome_equipamento = str(equipamento.get('equipamento', equipamento.get('Nome', 'N/A')))
+            categoria = str(equipamento.get('categoria', equipamento.get('Categoria', 'N/A')))
+            marca = str(equipamento.get('marca', equipamento.get('Marca', 'N/A')))
+            modelo = str(equipamento.get('modelo', equipamento.get('Modelo', 'N/A')))
+            quantidade_disp = int(equipamento.get('quantidade', equipamento.get('Quantidade', 0)))
+            valor_unit = float(equipamento.get('valor_unitario', equipamento.get('Valor Unitário', 0)))
+            condicao_raw = equipamento.get('condicao', equipamento.get('Condição', 'Novo'))
+        except Exception as e:
+            st.error(f"❌ Erro ao processar equipamento: {str(e)}")
+            return
+        
         # Informações do equipamento
         col_info1, col_info2, col_info3, col_info4 = st.columns(4)
         
         with col_info1:
-            st.markdown(f"**🖥️ Equipamento:** {equipamento['equipamento']}")
-            st.markdown(f"**📂 Categoria:** {equipamento['categoria']}")
+            st.markdown(f"**🖥️ Equipamento:** {nome_equipamento}")
+            st.markdown(f"**📂 Categoria:** {categoria}")
         
         with col_info2:
-            st.markdown(f"**🏢 Marca:** {equipamento['marca']}")
-            st.markdown(f"**🔧 Modelo:** {equipamento.get('modelo', 'N/A')}")
+            st.markdown(f"**🏢 Marca:** {marca}")
+            st.markdown(f"**🔧 Modelo:** {modelo}")
         
         with col_info3:
-            st.markdown(f"**📊 Disponível:** {equipamento['quantidade']} unidades")
-            st.markdown(f"**💰 Valor Unit:** R$ {equipamento['valor_unitario']:,.2f}")
+            st.markdown(f"**📊 Disponível:** {quantidade_disp} unidades")
+            st.markdown(f"**💰 Valor Unit:** R$ {valor_unit:,.2f}")
             
         with col_info4:
-            condicao_raw = equipamento.get('condicao', 'N/A')
             condicao_atual = normalizar_condicao_equipamento(condicao_raw)
             icon_condicao = "🆕" if condicao_atual == "Novo" else "🔄" if condicao_atual == "Usado" else "❓"
             st.markdown(f"**{icon_condicao} Condição:** {condicao_atual}")
-            codigo_produto = equipamento.get('codigo_produto', 'N/A')
             st.markdown(f"**🔢 Código:** {codigo_produto}")
             
         # Verificar se existem outras condições para o mesmo código
-        codigo_produto = equipamento.get('codigo_produto', None)
-        if codigo_produto:
+        if codigo_produto and codigo_produto != 'N/A':
             agrupado = self.estoque_service.agrupar_equipamentos_por_codigo(str(codigo_produto))
             if agrupado and (agrupado.get('qtd_novos', 0) > 0 and agrupado.get('qtd_usados', 0) > 0):
                 st.info(f"📦 **Estoque total por código {codigo_produto}:** "
@@ -492,21 +506,23 @@ class RemoverEquipamentoPageProfessional:
         
         # Preview da operação
         st.markdown("---")
-        quantidade_key = f"qtd_remover_{equipamento['id']}_{int(equipamento['quantidade'])}"
+        # Criar key única usando código + condição + timestamp para evitar conflitos
+        import time
+        codigo_key = str(codigo_produto).replace('-', '_').replace('.', '_')
+        timestamp_key = str(int(time.time() * 1000) % 10000)  # Últimos 4 dígitos
+        quantidade_key = f"qtd_remover_{codigo_key}_{timestamp_key}"
         
         # Formulário de remoção COM KEYS ÚNICAS
-        form_key = f"remover_{equipamento['id']}_{int(equipamento['quantidade'])}"  # ✅ Key única incluindo quantidade
+        form_key = f"remover_{codigo_key}_{timestamp_key}"
         with st.form(form_key, clear_on_submit=True):
             col_form1, col_form2 = st.columns(2)
             
             with col_form1:
                 # ✅ SELEÇÃO DA CONDIÇÃO (COMO NA PÁGINA ADICIONAR)
-                condicao_raw = equipamento.get('condicao', CondicionEquipamento.NOVO.value)
                 condicao_atual = normalizar_condicao_equipamento(condicao_raw)
-                codigo_produto = equipamento.get('codigo_produto', '')
                 
                 # Verificar se existem outras condições para o mesmo código
-                agrupado = self.estoque_service.agrupar_equipamentos_por_codigo(str(codigo_produto)) if codigo_produto else {}
+                agrupado = self.estoque_service.agrupar_equipamentos_por_codigo(str(codigo_produto)) if codigo_produto and codigo_produto != 'N/A' else {}
                 
                 if agrupado and agrupado.get('qtd_novos', 0) > 0 and agrupado.get('qtd_usados', 0) > 0:
                     # Múltiplas condições disponíveis - permitir escolha
@@ -517,7 +533,7 @@ class RemoverEquipamentoPageProfessional:
                         options=[CondicionEquipamento.NOVO.value, CondicionEquipamento.USADO.value],
                         index=0 if condicao_atual == CondicionEquipamento.NOVO.value else 1,
                         help="💡 Escolha se deseja remover um equipamento NOVO ou USADO",
-                        key=f"condicao_{equipamento['id']}_{int(equipamento['quantidade'])}"
+                        key=f"condicao_{timestamp_key}"
                     )
                     
                     # Mostrar estoque disponível para a condição selecionada
@@ -531,15 +547,15 @@ class RemoverEquipamentoPageProfessional:
                     # Apenas uma condição disponível - confirmar apenas
                     condicao_selecionada = condicao_atual
                     st.info(f"📦 **Condição:** {condicao_atual} (única disponível)")
-                    qtd_disponivel = equipamento['quantidade']
+                    qtd_disponivel = quantidade_disp
                 
                 # Determinar quantidade máxima
                 if agrupado and agrupado.get('qtd_novos', 0) > 0 and agrupado.get('qtd_usados', 0) > 0:
                     max_quantidade = qtd_disponivel
                     help_text = f"💡 {qtd_disponivel} unidades {condicao_selecionada} disponíveis"
                 else:
-                    max_quantidade = int(equipamento['quantidade'])
-                    help_text = f"💡 {equipamento['quantidade']} unidades disponíveis"
+                    max_quantidade = quantidade_disp
+                    help_text = f"💡 {quantidade_disp} unidades disponíveis"
                 
                 # Botões de atalho rápido para quantidade
                 st.markdown("**⚡ Atalhos Rápidos:**")
@@ -575,7 +591,7 @@ class RemoverEquipamentoPageProfessional:
                     "📍 Destino",
                     placeholder="Ex: Filial SP, Cliente XYZ",
                     help="Para onde está sendo enviado",
-                    key=f"destino_{equipamento['id']}_{int(equipamento['quantidade'])}"
+                    key=f"destino_{timestamp_key}"
                 )
             
             with col_form2:
@@ -583,21 +599,21 @@ class RemoverEquipamentoPageProfessional:
                     "🏷️ Código de Saída",
                     placeholder="Ex: SAIDA-001-2024",
                     help="Código para rastreamento",
-                    key=f"codigo_{equipamento['id']}_{int(equipamento['quantidade'])}"
+                    key=f"codigo_saida_{timestamp_key}"
                 )
                 
                 observacoes = st.text_area(
                     "📝 Observações",
                     placeholder="Motivo da remoção, destino específico, etc.",
                     help="Informações adicionais",
-                    key=f"obs_{equipamento['id']}_{int(equipamento['quantidade'])}"
+                    key=f"obs_{timestamp_key}"
                 )
             
             # Cálculos e alertas (só quando quantidade > 0)
             if quantidade > 0:
-                valor_total = quantidade * equipamento['valor_unitario']
-                nova_quantidade = equipamento['quantidade'] - quantidade
-                percentual = (quantidade / equipamento['quantidade']) * 100
+                valor_total = quantidade * valor_unit
+                nova_quantidade = quantidade_disp - quantidade
+                percentual = (quantidade / quantidade_disp) * 100
                 
                 # ✅ PREVIEW DOS CÁLCULOS EM TEMPO REAL
                 st.markdown("---")
@@ -608,7 +624,7 @@ class RemoverEquipamentoPageProfessional:
                     st.markdown(f"**📦 Remover:** {quantidade} unidades")
                     st.markdown(f"**💰 Valor:** R$ {valor_total:,.2f}")
                 with col_calc2:
-                    st.markdown(f"**📊 Atual:** {equipamento['quantidade']} unidades")
+                    st.markdown(f"**📊 Atual:** {quantidade_disp} unidades")
                     st.markdown(f"**🔄 Operação:** -{quantidade}")
                 with col_calc3:
                     st.markdown(f"**📈 Resultado:** {nova_quantidade} unidades")
@@ -633,7 +649,7 @@ class RemoverEquipamentoPageProfessional:
                 st.warning("⚠️ **Remoção Significativa Detectada**")
                 confirmacao_checkbox = st.checkbox(
                     f"✅ Confirmo que desejo remover {quantidade} unidades ({percentual:.1f}% do estoque)",
-                    key=f"confirm_{equipamento['id']}_{int(equipamento['quantidade'])}"
+                    key=f"confirm_{timestamp_key}"
                 )
                 
                 if confirmacao_checkbox:
@@ -687,12 +703,9 @@ class RemoverEquipamentoPageProfessional:
                     )
                     if equipamento_condicao is None:
                         erros.append(f"Não há equipamentos {condicao_selecionada} disponíveis para o código {codigo_produto}")
-                    elif equipamento_condicao['quantidade'] < quantidade:
-                        erros.append(f"Quantidade insuficiente. Disponível {condicao_selecionada}: {equipamento_condicao['quantidade']} unidades")
-                    
-                    # Atualizar equipamento para o da condição correta
-                    if equipamento_condicao is not None:
-                        equipamento = equipamento_condicao
+                    elif equipamento_condicao.get('Quantidade', 0) < quantidade:
+                        # Note: banco retorna 'Quantidade' com maiúscula
+                        erros.append(f"Quantidade insuficiente. Disponível {condicao_selecionada}: {equipamento_condicao.get('Quantidade', 0)} unidades")
                 
                 # Mostrar erros APENAS se houver e após tentar submeter
                 if erros:
@@ -907,7 +920,7 @@ class RemoverEquipamentoPageProfessional:
         
         # Selecionar colunas para exibição
         colunas_exibicao = ['codigo_produto', 'equipamento', 'categoria', 'marca', 
-                          'quantidade', 'valor_unitario', 'valor_total', 'status']
+                          'quantidade', 'condicao', 'valor_unitario', 'valor_total']
         colunas_existentes = [col for col in colunas_exibicao if col in df_display.columns]
         
         # Formatar DataFrame
@@ -964,12 +977,18 @@ class RemoverEquipamentoPageProfessional:
     
     def _processar_remocao_individual(self, equipamento: pd.Series, quantidade: int,
                                     destino: str, observacoes: str, codigo_saida: str, condicao: str) -> None:
-        """Processa remoção individual de equipamento"""
+        """Processa remoção individual de equipamento - SEM usar 'id'"""
         try:
+            # Extrair dados do equipamento com fallbacks
+            codigo_produto = str(equipamento.get('codigo_produto', equipamento.name if hasattr(equipamento, 'name') else 'N/A'))
+            nome_equipamento = str(equipamento.get('equipamento', equipamento.get('Nome', 'N/A')))
+            quantidade_disp = int(equipamento.get('quantidade', equipamento.get('Quantidade', 0)))
+            valor_unit = float(equipamento.get('valor_unitario', equipamento.get('Valor Unitário', 0)))
+            
             # Mostrar preview resumido
             st.markdown("### ⏳ **Processando remoção...**")
-            valor_total = quantidade * equipamento['valor_unitario']
-            st.info(f"📦 **{equipamento['equipamento']}** | 📊 {quantidade} un. | 💰 R$ {valor_total:,.2f}")
+            valor_total = quantidade * valor_unit
+            st.info(f"📦 **{nome_equipamento}** | 📊 {quantidade} un. | 💰 R$ {valor_total:,.2f}")
             
             # Preparar observações completas
             obs_completas = observacoes.strip() if observacoes else ""
@@ -997,15 +1016,15 @@ class RemoverEquipamentoPageProfessional:
                 st.error(f"❌ Erro na conversão de condição: {condicao} → {str(e)}")
                 st.stop()
             
-            # Processar remoção
+            # Processar remoção - usar APENAS codigo_produto e condicao
             response = self.estoque_service.remover_equipamento(
-                equipamento['id'], quantidade, destino.strip(), obs_completas, condicao=condicao_enum
+                codigo_produto, quantidade, destino.strip(), obs_completas, condicao=condicao_enum
             )
             
             if response.success:
                 # ✅ SUCESSO - Mostrar detalhes completos
-                valor_removido = quantidade * equipamento['valor_unitario']
-                nova_quantidade = equipamento['quantidade'] - quantidade
+                valor_removido = quantidade * valor_unit
+                nova_quantidade = quantidade_disp - quantidade
                 
                 # Sucesso - Interface limpa e profissional
                 st.balloons()  # Animação de celebração
@@ -1013,8 +1032,9 @@ class RemoverEquipamentoPageProfessional:
                 # ✅ MENSAGEM FINAL DE SUCESSO
                 show_success_message(
                     f"✅ **Equipamento removido com sucesso!**\n\n"
-                    f"**📦 Equipamento:** {equipamento['equipamento']}\n"
-                    f"**🏷️ Código:** {equipamento.get('codigo_produto', 'N/A')}\n"
+                    f"**📦 Equipamento:** {nome_equipamento}\n"
+                    f"**🏷️ Código:** {codigo_produto}\n"
+                    f"**🔄 Condição:** {condicao}\n"
                     f"**📊 Quantidade:** {quantidade} unidades\n"
                     f"**💰 Valor:** R$ {valor_removido:,.2f}\n"
                     f"**📈 Novo estoque:** {nova_quantidade} unidades\n"
@@ -1030,7 +1050,7 @@ class RemoverEquipamentoPageProfessional:
                 if hasattr(st, 'cache_data'):
                     st.cache_data.clear()
                 
-                logger.info(f"✅ Remoção bem-sucedida: {quantidade} un. de {equipamento['equipamento']}")
+                logger.info(f"✅ Remoção bem-sucedida: {quantidade} un. de {nome_equipamento}")
                 
                 # Recarregar página
                 import time
@@ -1057,8 +1077,10 @@ class RemoverEquipamentoPageProfessional:
                 try:
                     obs_lote = f"Operação em lote | {row.get('OBSERVACOES', '')}"
                     
+                    # Usar codigo_produto em vez de id
+                    codigo_lote = row.get('codigo_produto', 'N/A')
                     response = self.estoque_service.remover_equipamento(
-                        row['id'], 
+                        codigo_lote, 
                         int(row['QTD_REMOVER']), 
                         str(row['DESTINO']).strip(), 
                         obs_lote

@@ -3,6 +3,10 @@ Service Loader - Dashboard Estoque TI
 Carrega automaticamente o serviço correto (Excel ou PostgreSQL)
 """
 
+# ✅ Carregar variáveis de ambiente PRIMEIRO
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 from loguru import logger
 

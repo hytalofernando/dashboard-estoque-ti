@@ -121,7 +121,7 @@ class AdicionarEquipamentoProfessional:
                         'quantidade': row.get('quantidade', 0),
                         'valor_unitario': row.get('valor_unitario', 0.0),
                         'fornecedor': row.get('fornecedor', ''),
-                        'status': normalizar_status_equipamento(row.get('status', 'Disponível'))
+                        'condicao': row.get('condicao', 'Novo')
                     }
             
             logger.info(f"✅ Cache TTL carregado: {len(cache_equipamentos)} equipamentos")
@@ -828,32 +828,22 @@ class AdicionarEquipamentoProfessional:
         """Executa a adição do equipamento"""
         try:
             if is_produto_existente and produto_existente:
-                # Buscar equipamento específico da condição selecionada
+                # Criar equipamento para adicionar (o método adicionar_equipamento já verifica se existe)
                 condicao_enum = CondicionEquipamento(condicao)
-                equipamento_especifico = self.estoque_service.obter_equipamento_por_codigo_e_condicao(
-                    codigo_produto, condicao_enum
+                novo_equipamento = Equipamento(
+                    equipamento=produto_existente['equipamento'],
+                    categoria=produto_existente['categoria'],
+                    marca=produto_existente['marca'],
+                    modelo=produto_existente['modelo'],
+                    codigo_produto=codigo_produto.strip().upper(),
+                    quantidade=quantidade,
+                    valor_unitario=valor_unitario,
+                    fornecedor=fornecedor.strip(),
+                    condicao=condicao_enum
                 )
                 
-                if equipamento_especifico is not None:
-                    # Aumentar estoque existente da condição específica
-                    response = self.estoque_service.aumentar_estoque(
-                        equipamento_especifico['id'], quantidade, valor_unitario, fornecedor, condicao_enum
-                    )
-                else:
-                    # Criar nova linha para esta condição
-                    novo_equipamento = Equipamento(
-                        equipamento=produto_existente['equipamento'],
-                        categoria=produto_existente['categoria'],
-                        marca=produto_existente['marca'],
-                        modelo=produto_existente['modelo'],
-                        codigo_produto=codigo_produto.strip().upper(),
-                        quantidade=quantidade,
-                        valor_unitario=valor_unitario,
-                        fornecedor=fornecedor.strip(),
-                        condicao=condicao_enum
-                    )
-                    
-                    response = self.estoque_service.adicionar_equipamento(novo_equipamento)
+                # O método adicionar_equipamento já verifica se existe e aumenta a quantidade
+                response = self.estoque_service.adicionar_equipamento(novo_equipamento)
                 
                 if response.success:
                     # Atualizar estatísticas
