@@ -61,8 +61,8 @@ def format_currency(value: float) -> str:
 
 
 def create_info_cards(stats: Dict[str, Any]) -> None:
-    """Cria cards informativos com métricas"""
-    col1, col2, col3, col4 = st.columns(4)
+    """Cria cards informativos com métricas - SEM valor total"""
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         create_metric_card(
@@ -73,19 +73,12 @@ def create_info_cards(stats: Dict[str, Any]) -> None:
     
     with col2:
         create_metric_card(
-            "Valor Total do Estoque", 
-            format_currency(stats.get('valor_total', 0)),
-            help_text="Valor total de todos os equipamentos"
-        )
-    
-    with col3:
-        create_metric_card(
             "Categorias", 
             str(stats.get('categorias_unicas', 0)),
             help_text="Número de categorias diferentes"
         )
     
-    with col4:
+    with col3:
         create_metric_card(
             "Equipamentos Disponíveis", 
             f"{stats.get('disponiveis', 0):,}",

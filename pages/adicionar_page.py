@@ -690,16 +690,12 @@ class AdicionarEquipamentoProfessional:
                 key="campo_quantidade"
             )
             
-            # Valor com sugestão inteligente baseada na condição
-            valor_default = valor_sugerido if 'valor_sugerido' in locals() else (produto_existente['valor_unitario'] if produto_existente else 100.00)
-            valor_unitario = st.number_input(
-                "💰 Valor Unitário (R$) *",
-                min_value=settings.MIN_VALOR,
-                value=float(valor_default),
-                step=0.01,
-                format="%.2f",
-                key="campo_valor"
-            )
+            # Valor unitário OCULTO - fixado em 100.00
+            valor_default = 100.00
+            valor_unitario = valor_default  # Valor fixo, não editável
+            # Campo oculto para manter no session_state
+            if 'campo_valor' not in st.session_state:
+                st.session_state['campo_valor'] = valor_default
             
             fornecedor = st.text_input(
                 "🏪 Fornecedor *",
@@ -708,17 +704,16 @@ class AdicionarEquipamentoProfessional:
                 key="campo_fornecedor"
             )
         
-        # Cálculos em tempo real com condição
-        if quantidade > 0 and valor_unitario > 0:
-            valor_total = quantidade * valor_unitario
+        # Preview do estoque (SEM mostrar valores)
+        if quantidade > 0:
             condicao_atual = st.session_state.get('campo_condicao', CondicionEquipamento.NOVO.value)
             
-            col_calc1, col_calc2 = st.columns(2)
-            with col_calc1:
-                st.markdown(f"### 💰 **Valor Total: R$ {valor_total:,.2f}**")
-                st.markdown(f"**🔄 Condição:** {condicao_atual}")
+            # Mostrar apenas informações de estoque, sem valores monetários
+            st.markdown(f"### 📊 **Preview do Estoque**")
+            st.markdown(f"**🔄 Condição:** {condicao_atual}")
             
-            with col_calc2:
+            col_calc = st.columns(1)[0]
+            with col_calc:
                 if is_produto_existente and produto_existente:
                     # Mostrar novo estoque por condição
                     if condicao_atual == CondicionEquipamento.NOVO.value:
@@ -744,13 +739,9 @@ class AdicionarEquipamentoProfessional:
                     st.markdown(f"### 📊 **Primeiro Estoque: {quantidade:,} un.**")
                     st.markdown(f"**Condição:** {condicao_atual}")
             
-            # Alertas inteligentes
-            if valor_total > 100000:
-                st.warning("⚠️ **Valor alto!** Confirme antes de prosseguir.")
-            
-            # Alerta para valores suspeitos de equipamentos usados
-            if condicao_atual == CondicionEquipamento.USADO.value and valor_unitario > 5000:
-                st.info("💡 **Dica:** Equipamentos usados geralmente têm valor menor. Verifique o preço.")
+            # Alertas inteligentes de quantidade
+            if quantidade > 100:
+                st.warning("⚠️ **Quantidade alta!** Confirme antes de prosseguir.")
     
     def _render_validacao_submit(self, is_produto_existente: bool, produto_existente: Optional[Dict]) -> None:
         """Renderiza validação e botões de submit"""
@@ -854,8 +845,7 @@ class AdicionarEquipamentoProfessional:
                         f"✅ **Estoque atualizado com sucesso!**\n\n"
                         f"**📦 Equipamento:** {produto_existente['equipamento']}\n"
                         f"**🔄 Condição:** {condicao}\n"
-                        f"**📊 Quantidade:** +{quantidade} unidades\n"
-                        f"**💰 Valor:** R$ {quantidade * valor_unitario:,.2f}"
+                        f"**📊 Quantidade:** +{quantidade} unidades"
                     )
                     
                     if st.session_state.adicionar_config['notification_enabled']:
@@ -894,8 +884,7 @@ class AdicionarEquipamentoProfessional:
                         f"**📦 Equipamento:** {equipamento}\n"
                         f"**🏷️ Código:** {codigo_produto}\n"
                         f"**🔄 Condição:** {condicao}\n"
-                        f"**📊 Quantidade:** {quantidade} unidades\n"
-                        f"**💰 Valor Total:** R$ {quantidade * valor_unitario:,.2f}"
+                        f"**📊 Quantidade:** {quantidade} unidades"
                     )
                     
                     if st.session_state.adicionar_config['notification_enabled']:
@@ -937,8 +926,7 @@ class AdicionarEquipamentoProfessional:
         if not fornecedor or len(fornecedor.strip()) < 2:
             erros.append("Fornecedor deve ter pelo menos 2 caracteres")
         
-        if valor_unitario <= 0:
-            erros.append("Valor unitário deve ser maior que zero")
+        # Validação de valor_unitario removida (agora é fixo em 100.00)
         
         if quantidade <= 0:
             erros.append("Quantidade deve ser maior que zero")
@@ -1054,13 +1042,11 @@ class AdicionarEquipamentoProfessional:
             
             st.success("✅ **Lote válido!**")
             
-            col_resumo1, col_resumo2, col_resumo3 = st.columns(3)
+            col_resumo1, col_resumo2 = st.columns(2)
             with col_resumo1:
                 st.metric("📦 Equipamentos", total_itens)
             with col_resumo2:
                 st.metric("📊 Total Unidades", f"{total_unidades:,}")
-            with col_resumo3:
-                st.metric("💰 Valor Total", f"R$ {valor_total:,.2f}")
             
             # Botão para processar lote
             if st.button(

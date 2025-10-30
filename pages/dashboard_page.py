@@ -54,12 +54,9 @@ class DashboardPage:
             with col1:
                 self._render_pie_chart_agrupado(df_estoque_agrupado)
                 self._render_bar_chart_marca_agrupado(df_estoque_agrupado)
-                # NOVO: Gráfico de valor por categoria e condição
-                self._render_grafico_valor_condicao(df_estoque_original)
             
             with col2:
                 self._render_line_chart(df_estoque_original)  # Mantém dados originais para temporal
-                self._render_treemap_value_agrupado(df_estoque_agrupado)
             
             st.markdown("---")
             
@@ -239,35 +236,29 @@ class DashboardPage:
     # ===== NOVOS MÉTODOS - MELHORIAS FASE 1 =====
     
     def _render_metricas_aprimoradas(self, stats: Dict[str, Any]) -> None:
-        """Renderiza métricas detalhadas com separação Novo/Usado"""
+        """Renderiza métricas detalhadas com separação Novo/Usado - SEM valores"""
         st.markdown("### 📊 Análise Detalhada por Condição")
         
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
         
         with col1:
-            # Equipamentos Novos com valor
+            # Equipamentos Novos
             total_novos = stats.get('total_novos', 0)
-            valor_novos = stats.get('valor_novos', 0)
             
             st.metric(
                 "🆕 Equipamentos Novos",
                 f"{total_novos:,} unidades",
-                delta=f"R$ {valor_novos:,.2f}",
-                delta_color="normal",
-                help="Total de equipamentos em condição nova e seu valor de mercado"
+                help="Total de equipamentos em condição nova"
             )
         
         with col2:
-            # Equipamentos Usados com valor
+            # Equipamentos Usados
             total_usados = stats.get('total_usados', 0)
-            valor_usados = stats.get('valor_usados', 0)
             
             st.metric(
                 "🔄 Equipamentos Usados", 
                 f"{total_usados:,} unidades",
-                delta=f"R$ {valor_usados:,.2f}",
-                delta_color="normal",
-                help="Total de equipamentos usados/recondicionados e seu valor"
+                help="Total de equipamentos usados/recondicionados"
             )
         
         with col3:
@@ -290,18 +281,6 @@ class DashboardPage:
                 f"{percentual_novos:.1f}%",
                 delta=f"{status_icon} {status_text}",
                 help="Percentual de equipamentos novos. Ideal: >70%"
-            )
-        
-        with col4:
-            # Valor Médio por Equipamento
-            total_equipamentos = stats.get('total_equipamentos', 1)
-            valor_total = stats.get('valor_total', 0)
-            valor_medio = valor_total / total_equipamentos if total_equipamentos > 0 else 0
-            
-            st.metric(
-                "💰 Valor Médio/Un.",
-                f"R$ {valor_medio:,.2f}",
-                help="Valor médio por unidade de equipamento"
             )
         
         st.markdown("---")
